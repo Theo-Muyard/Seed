@@ -53,7 +53,21 @@ t_Line		*line_new(void);
  * @brief Destroys the given line.
  * @param line The line that will be destroyed.
 */
-void		line_destroy(t_Line *line);
+void		line_destroy(t_Buffer *buffer, t_Line *line);
+
+/**
+ * @brief Adds the line to the start of the buffer.
+ * @param buffer The buffer.
+ * @param line The line.
+*/
+void		line_add_front(t_Buffer *buffer, t_Line *line);
+
+/**
+ * @brief Adds the line to the end of the buffer.
+ * @param buffer The buffer.
+ * @param line The line.
+*/
+void		line_add_back(t_Buffer *buffer, t_Line *line);
 
 /**
  * @brief Splits the given line in two lines.

@@ -2,35 +2,33 @@
 # 						NAMES
 # | ================================================ |
 
-NAME		=	seed_core
-BUILD_DIR	=	build
+NAME				=	seed_test
+BUILD_DIR			=	build/tests
 
 # | ================================================ |
 # 					COMPILATION
 # | ================================================ |
 
-CC			=	cc
-CFLAGS		=	-Wall -Wextra -Werror -g3
+CC					=	cc
+CFLAGS				=	-Wall -Wextra -Werror
 
 # | ================================================ |
 # 					INCLUDES
 # | ================================================ |
-
-INCLUDES	=	-I includes -I includes/systems
+INCLUDES			=	-I includes -I includes/systems
 
 # | ================================================ |
 # 					SOURCE FILES
 # | ================================================ |
 
-SRC			=	main.c \
-\
-				systems/writing.c
+WRITING_SRC			=	src/systems/writing.c \
+						tests/systems/TEST_writing.c
 
 # | ================================================ |
 # 					OBJ FILES
 # | ================================================ |
 
-OBJ			=	$(addprefix $(BUILD_DIR)/, $(SRC:.c=.o))
+WRITING_OBJ			=	$(addprefix $(BUILD_DIR)/, $(notdir $(WRITING_SRC:.c=.o)))
 
 # | ================================================ |
 # 					COLORS / WIDTH
@@ -43,43 +41,48 @@ BLUE		=	\033[34m
 WHITE		=	\033[37m
 
 # | ================================================ |
+# 					TEST FUNCTION
+# | ================================================ |
+
+define TEST_RULE
+$1: OBJ := $2
+$1: $(NAME)
+endef
+
+# | ================================================ |
+# 					COMPILE FUNCTION
+# | ================================================ |
+
+define COMPILE_OBJ
+$(BUILD_DIR)/$(notdir $(1:.c=.o)): $(1) | $(BUILD_DIR)
+	@$(CC) $(CFLAGS) -c $$< -o $$@ $(INCLUDES)
+	@printf "$(BLUE)%-$(COL_WIDTH)s$(WHITE): ✔️\n" "$$(notdir $$@)"
+endef
+
+# | ================================================ |
 # 					MAKE RULE
 # | ================================================ |
 
-all: $(NAME)
+all:
+	@echo "$(BLUE)Usage$(WHITE): make test TARGET=<target>"
 
-$(NAME): $(BUILD_DIR) $(OBJ)
-	@$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
+$(NAME): $(BUILD_DIR) $(WRITING_OBJ)
+	@$(CC) $(CFLAGS) $(WRITING_OBJ) -o $(NAME)
 	@echo "$(GREEN)Done$(WHITE)."
 
 # | ================================================ |
-# 					CLEAN RULE
+# 					RUN RULE
 # | ================================================ |
 
-clean:
-	@rm -rf $(BUILD_DIR)
-	@echo "$(RED)Cleaned$(WHITE)."
+run:
+	@echo "$(BLUE)Run$(WHITE) the test...\n"
+	./$(NAME)
+	@echo "\nTest $(RED)ended$(WHITE)."
 
 # | ================================================ |
-# 					FCLEAN RULE
+# 					WRITING RULE
 # | ================================================ |
-
-fclean:
-	@rm -rf $(BUILD_DIR) $(NAME)
-	@echo "$(RED)Fcleaned$(WHITE)."
-
-# | ================================================ |
-# 					RE RULE
-# | ================================================ |
-
-re: fclean all
-
-# | ================================================ |
-# 					TESTS RULES
-# | ================================================ |
-
-test:
-	@$(MAKE) -s $(TARGET) -f tests.mk
+$(eval $(call TEST_RULE, writing, $(WRITING_OBJ)))
 
 # | ================================================ |
 # 					DIRECTORY
@@ -93,9 +96,6 @@ $(BUILD_DIR):
 # 					OBJECTS
 # | ================================================ |
 
-$(BUILD_DIR)/%.o: src/%.c
-	@mkdir -p $(dir $@)
-	@$(CC) $(CFLAGS) -c $< -o $@ $(INCLUDES)
-	@printf "$(BLUE)%-$(COL_WIDTH)s$(WHITE): ✔️\n" "$(notdir $@)"
+$(foreach src, $(WRITING_SRC), $(eval $(call COMPILE_OBJ,$(src))))
 
-.PHONY: all clean fclean re test
+.PHONY: all run writing

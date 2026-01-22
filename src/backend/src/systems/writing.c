@@ -2,7 +2,7 @@
 #include <string.h>
 #include "writing.h"
 
-#define DATA_REALLOC 32
+#define DATA_REALLOC 128
 
 /*
 ==============================================================
@@ -30,9 +30,9 @@ void		buffer_destroy(t_Buffer *buffer)
 		return ;
 	while (buffer->first_line)
 	{
-		_tmp = buffer->first_line;
-		line_destroy(buffer->first_line);
-		buffer->first_line = _tmp->next;
+		_tmp = buffer->first_line->next;
+		line_destroy(buffer, buffer->first_line);
+		buffer->first_line = _tmp;
 	}
 	free(buffer);
 }
@@ -58,12 +58,53 @@ t_Line		*line_new(void)
 	return (line);
 }
 
-void		line_destroy(t_Line *line)
+void		line_destroy(t_Buffer *buffer, t_Line *line)
 {
+	t_Line	*_prev;
+	t_Line	*_next;
+
 	if (NULL == line)
 		return ;
+	
+	_prev = line->prev;
+	_next = line->next;
+	if (_prev)
+		_prev->next = _next;
+	else
+		buffer->first_line = _next;
+	if (_next)
+		_next->prev = _prev;
 	free(line->data);
 	free(line);
+}
+
+void		line_add_front(t_Buffer *buffer, t_Line *line)
+{
+	if (NULL == buffer || NULL == line)
+		return ;
+	
+	if (buffer->first_line)
+	{
+		line->next = buffer->first_line;
+		buffer->first_line->prev = line;
+	}
+	buffer->first_line = line;
+}
+
+void		line_add_back(t_Buffer *buffer, t_Line *line)
+{
+	t_Line	*_tmp;
+	
+	if (NULL == buffer || NULL == line)
+		return ;
+
+	_tmp = buffer->first_line;
+	if (NULL == _tmp)
+		buffer->first_line = line;
+	while (_tmp->next)
+		_tmp = _tmp->next;
+	_tmp->next = line;
+	line->prev = _tmp;
 }
 
 /*
@@ -83,10 +124,10 @@ bool		add_to_line(t_Line *line, size_t start_col, size_t size, const char *data)
 	if (start_col > line->len)
 		return (false);
 
-	_needed_capacity = line->len + size;
+	_needed_capacity = line->len + size + 1;
 	if (_needed_capacity > line->capacity)
 	{
-		_new_capacity = line->capacity;
+		_new_capacity = line->capacity ? line->capacity : DATA_REALLOC;
 		while (_new_capacity < _needed_capacity)
 			_new_capacity += DATA_REALLOC;
 		_new_data = realloc(line->data, _new_capacity * sizeof(char));
@@ -102,15 +143,25 @@ bool		add_to_line(t_Line *line, size_t start_col, size_t size, const char *data)
 	);
 	memcpy(line->data + start_col, data, size);
 	line->len += size;
+	line->data[line->len] = '\0';
 	return (true);
 }
 
 bool		delete_to_line(t_Line *line, size_t start_col, size_t size)
 {
-	size_t	_new_capacity;
-
 	if (NULL == line)
 		return (false);
-	if (start_col > line)
-		return (false);
+	if (start_col >= line->len)
+    	return false;
+	if (start_col + size > line->len)
+    	size = line->len - start_col;
+
+	memmove(
+			line->data + start_col,
+			line->data + start_col + size,
+			line->len - (start_col + size)
+	);
+	line->len = line->len - size;
+	line->data[line->len] = '\0';
+	return (true);
 }

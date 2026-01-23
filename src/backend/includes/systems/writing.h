@@ -1,8 +1,10 @@
 #ifndef SEED_WRITING_H
-#define SEED_WRITING_H
+# define SEED_WRITING_H
 
-# include "stddef.h"
-# include "stdbool.h"
+# include <unistd.h>
+# include <stdbool.h>
+
+// +===----- TYPES -----===+ //
 
 typedef struct	s_Line
 {
@@ -15,21 +17,17 @@ typedef struct	s_Line
 
 typedef struct s_Buffer
 {
-	t_Line	*first_line;
-	size_t	size;
+	t_Line	*line;
+	ssize_t	size;
 }	t_Buffer;
 
-/*
-==============================================================
-                            BUFFER
-==============================================================
-*/
+// +===----- BUFFER -----===+ //
 
 /**
  * @brief Creates a new empty buffer.
  * @return The buffer that has just been created.
 */
-t_Buffer	*buffer_new(void);
+t_Buffer	*buffer_create(void);
 
 /**
  * @brief Destroys the given buffer.
@@ -37,77 +35,69 @@ t_Buffer	*buffer_new(void);
 */
 void		buffer_destroy(t_Buffer *buffer);
 
-/*
-==============================================================
-                            LINES
-==============================================================
-*/
+// TODO: DELETE (DEBUG)
+bool		buffer_check(t_Buffer *b);
+
+// +===----- LINES -----===+ //
 
 /**
  * @brief Creates a new empty line.
  * @return The line that has just been created.
 */
-t_Line		*line_new(void);
+t_Line		*line_create(void);
 
 /**
  * @brief Destroys the given line.
+ * @param buffer The buffer that contains lines.
  * @param line The line that will be destroyed.
 */
-void		line_destroy(t_Buffer *buffer, t_Line *line);
+void		buffer_line_destroy(t_Buffer *buffer, t_Line *line);
 
 /**
- * @brief Adds the line to the start of the buffer.
- * @param buffer The buffer.
- * @param line The line.
+ * @brief Adds the line to the index of the buffer.
+ * @param buffer The buffer that contains lines.
+ * @param line The line that will be added in the given index of the buffer.
+ * @param index The index of the line will be added.
 */
-void		line_add_front(t_Buffer *buffer, t_Line *line);
-
-/**
- * @brief Adds the line to the end of the buffer.
- * @param buffer The buffer.
- * @param line The line.
-*/
-void		line_add_back(t_Buffer *buffer, t_Line *line);
+bool		buffer_line_insert(t_Buffer *buffer, t_Line *line, ssize_t index);
 
 /**
  * @brief Splits the given line in two lines.
+ * @param buffer The buffer that contains lines.
  * @param line The line that will be split.
  * @param index The index where the line will be splited.
  * @return TRUE for success or FALSE if an error occured.
 */
-t_Line		*line_split(t_Line *line, size_t index);
+t_Line		*buffer_line_split(t_Buffer *buffer, t_Line *line, size_t index);
 
 /**
  * @brief Joins the givens line in one line.
- * @param first The first line.
- * @param second The second line.
+ * @param buffer The buffer that contains lines.
+ * @param dst The line that will be contains the lines joined.
+ * @param src The line that will be destroyed.
  * @return TRUE for success or FALSE if an error occured.
 */
-t_Line		*line_join(t_Line *first, t_Line *second);
+t_Line		*buffer_line_join(t_Buffer *buffer, t_Line *dst, t_Line *src);
 
-/*
-==============================================================
-                            DATA
-==============================================================
-*/
+// +===----- DATA -----===+ //
 
 /**
  * @brief Add the data to the given line.
  * @param line The line.
- * @param start_col The first column where data is added.
+ * @param column The first column where data is added.
  * @param size The size of the data.
- * @param data The data to add.
+ * @param data The data that will be added.
  * @return TRUE for success or FALSE if an error occured.
 */
-bool		add_to_line(t_Line *line, size_t start_col, size_t size, const char *data);
+bool		line_add_data(t_Line *line, ssize_t column, size_t size, const char *data);
 
 /**
  * @brief Delete the data to the given line.
  * @param line The line.
- * @param start_col The first column where data is added.
+ * @param column The first column where data is added.
  * @param size The size of the data.
  * @return TRUE for success or FALSE if an error occured.
 */
-bool		delete_to_line(t_Line *line, size_t start_col, size_t size);
+bool		line_delete_data(t_Line *line, ssize_t column, size_t size);
 
 #endif

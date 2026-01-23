@@ -2,7 +2,7 @@
 #include <string.h>
 #include "writing.h"
 
-#define DATA_REALLOC 128
+#define DATA_ALLOC 128
 
 /*
 ==============================================================
@@ -10,14 +10,14 @@
 ==============================================================
 */
 
-t_Buffer	*buffer_new(void)
+t_Buffer	*buffer_create(void)
 {
 	t_Buffer	*buffer;
 
 	buffer = malloc(sizeof(t_Buffer));
 	if (NULL == buffer)
 		return (NULL);
-	buffer->first_line = NULL;
+	buffer->line = NULL;
 	buffer->size = 0;
 	return (buffer);
 }
@@ -28,14 +28,31 @@ void		buffer_destroy(t_Buffer *buffer)
 
 	if (NULL == buffer)
 		return ;
-	while (buffer->first_line)
+	while (buffer->line)
 	{
-		_tmp = buffer->first_line->next;
-		line_destroy(buffer, buffer->first_line);
-		buffer->first_line = _tmp;
+		_tmp = buffer->line->next;
+		buffer_line_destroy(buffer, buffer->line);
+		buffer->line = _tmp;
 	}
 	free(buffer);
 }
+
+// TODO: DELETE (DEBUG)
+bool		buffer_check(t_Buffer *b)
+{
+	size_t count = 0;
+	t_Line *l = b->line;
+
+	while (l)
+	{
+		if (l->next && l->next->prev != l)
+			return false;
+		count++;
+		l = l->next;
+	}
+	return (count == (size_t)b->size);
+}
+
 
 /*
 ==============================================================
@@ -43,7 +60,7 @@ void		buffer_destroy(t_Buffer *buffer)
 ==============================================================
 */
 
-t_Line		*line_new(void)
+t_Line		*line_create(void)
 {
 	t_Line	*line;
 
@@ -58,7 +75,7 @@ t_Line		*line_new(void)
 	return (line);
 }
 
-void		line_destroy(t_Buffer *buffer, t_Line *line)
+void		buffer_line_destroy(t_Buffer *buffer, t_Line *line)
 {
 	t_Line	*_prev;
 	t_Line	*_next;
@@ -71,40 +88,93 @@ void		line_destroy(t_Buffer *buffer, t_Line *line)
 	if (_prev)
 		_prev->next = _next;
 	else
-		buffer->first_line = _next;
+		buffer->line = _next;
 	if (_next)
 		_next->prev = _prev;
+	if (buffer->size > 0)
+		buffer->size--;
 	free(line->data);
 	free(line);
 }
 
-void		line_add_front(t_Buffer *buffer, t_Line *line)
-{
-	if (NULL == buffer || NULL == line)
-		return ;
-	
-	if (buffer->first_line)
-	{
-		line->next = buffer->first_line;
-		buffer->first_line->prev = line;
-	}
-	buffer->first_line = line;
-}
-
-void		line_add_back(t_Buffer *buffer, t_Line *line)
+bool		buffer_line_insert(t_Buffer *buffer, t_Line *line, ssize_t index)
 {
 	t_Line	*_tmp;
-	
-	if (NULL == buffer || NULL == line)
-		return ;
+	ssize_t	_i;
 
-	_tmp = buffer->first_line;
-	if (NULL == _tmp)
-		buffer->first_line = line;
-	while (_tmp->next)
+	if (NULL == buffer || NULL == line)
+		return (false);
+	
+	if (index < 0)
+		index = buffer->size;
+	if (index > buffer->size)
+		return (false);
+
+	if (index == 0)
+	{
+		line->next = buffer->line;
+		line->prev = NULL;
+		if (buffer->line)
+			buffer->line->prev = line;
+		buffer->line = line;
+		buffer->size++;
+		return (true);
+	}
+	_i = 0;
+	_tmp = buffer->line;
+	while (_tmp && _i < index - 1)
+	{
 		_tmp = _tmp->next;
-	_tmp->next = line;
+		_i++;
+	}
+	if (NULL == _tmp)
+		return (false);
+	line->next = _tmp->next;
 	line->prev = _tmp;
+	if (_tmp->next)
+		_tmp->next->prev = line;
+	_tmp->next = line;
+	buffer->size++;
+	return (true);
+}
+
+t_Line		*buffer_line_split(t_Buffer *buffer, t_Line *line, size_t index)
+{
+	t_Line	*_new_line;
+	t_Line	*_tmp;
+	size_t	_size;
+
+	if (NULL == buffer || NULL == line)
+		return (NULL);
+	if (index > line->len)
+		return (NULL);
+
+	_new_line = line_create();
+	if (NULL == _new_line)
+		return (NULL);
+	_size = line->len - index;
+	if (false == line_add_data(_new_line, 0, _size, line->data + index))
+		return (buffer_line_destroy(buffer, _new_line), NULL);
+	if (false == line_delete_data(line, index, _size))
+		return (buffer_line_destroy(buffer, _new_line), NULL);
+	_tmp = line->next;
+	_new_line->prev = line;
+	_new_line->next = _tmp;
+	if (_tmp)
+		_tmp->prev = _new_line;
+	line->next = _new_line;
+	buffer->size++;
+	return (_new_line);
+}
+
+t_Line		*buffer_line_join(t_Buffer *buffer, t_Line *dst, t_Line *src)
+{
+	if (NULL == dst || NULL == src)
+		return (NULL);
+	if (false == line_add_data(dst, dst->len, src->len, src->data))
+		return (NULL);
+	buffer_line_destroy(buffer, src);
+	return (dst);
 }
 
 /*
@@ -113,7 +183,7 @@ void		line_add_back(t_Buffer *buffer, t_Line *line)
 ==============================================================
 */
 
-bool		add_to_line(t_Line *line, size_t start_col, size_t size, const char *data)
+bool		line_add_data(t_Line *line, ssize_t column, size_t size, const char *data)
 {
 	char	*_new_data;
 	size_t	_needed_capacity;
@@ -121,15 +191,17 @@ bool		add_to_line(t_Line *line, size_t start_col, size_t size, const char *data)
 
 	if (NULL == line || NULL == data)
 		return (false);
-	if (start_col > line->len)
+	if (column < 0)
+		column = line->len;
+	if ((size_t)column > line->len)
 		return (false);
 
 	_needed_capacity = line->len + size + 1;
 	if (_needed_capacity > line->capacity)
 	{
-		_new_capacity = line->capacity ? line->capacity : DATA_REALLOC;
+		_new_capacity = line->capacity ? line->capacity : DATA_ALLOC;
 		while (_new_capacity < _needed_capacity)
-			_new_capacity += DATA_REALLOC;
+			_new_capacity *= 2;
 		_new_data = realloc(line->data, _new_capacity * sizeof(char));
 		if (NULL == _new_data)
 			return (false);
@@ -137,29 +209,33 @@ bool		add_to_line(t_Line *line, size_t start_col, size_t size, const char *data)
 		line->capacity = _new_capacity;
 	}
 	memmove(
-		line->data + start_col + size,
-		line->data + start_col,
-		line->len - start_col
+		line->data + column + size,
+		line->data + column,
+		line->len - column
 	);
-	memcpy(line->data + start_col, data, size);
+	memcpy(line->data + column, data, size);
 	line->len += size;
 	line->data[line->len] = '\0';
 	return (true);
 }
 
-bool		delete_to_line(t_Line *line, size_t start_col, size_t size)
+bool		line_delete_data(t_Line *line, ssize_t column, size_t size)
 {
 	if (NULL == line)
 		return (false);
-	if (start_col >= line->len)
-    	return false;
-	if (start_col + size > line->len)
-    	size = line->len - start_col;
+	if (column < 0)
+		column = line->len;
+	if ((size_t)column > line->len)
+		return (false);
+	if (column + size > line->len)
+    	size = line->len - column;
+	if (NULL == line->data || line->len == 0)
+		return (false);
 
 	memmove(
-			line->data + start_col,
-			line->data + start_col + size,
-			line->len - (start_col + size)
+			line->data + column,
+			line->data + column + size,
+			line->len - (column + size)
 	);
 	line->len = line->len - size;
 	line->data[line->len] = '\0';

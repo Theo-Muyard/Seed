@@ -56,9 +56,8 @@ t_Dispatcher	*dispatcher_create(size_t capacity);
 /**
  * @brief Destroy the dispatcher.
  * @param dispatcher The dispatcher that will contains commands.
- * @return TRUE for success or FALSE if an error occured.
 */
-bool	dispatcher_destroy(t_Dispatcher *dispatcher);
+void	dispatcher_destroy(t_Dispatcher *dispatcher);
 
 /**
  * @brief Register the command with his function.

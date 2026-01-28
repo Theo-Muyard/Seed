@@ -39,16 +39,15 @@ t_Dispatcher	*dispatcher_create(size_t capacity)
 	return (dispatcher);
 }
 
-bool	dispatcher_destroy(t_Dispatcher *dispatcher)
+void	dispatcher_destroy(t_Dispatcher *dispatcher)
 {
 	if (NULL == dispatcher)
-		return (false);
+		return ;
 	free(dispatcher->commands);
 	dispatcher->commands = NULL;
 	dispatcher->count = 0;
 	dispatcher->capacity = 0;
 	free(dispatcher);
-	return (true);
 }
 
 bool	dispatcher_register(t_Dispatcher *dispatcher, t_CommandId id, t_Fn fn)
@@ -70,16 +69,16 @@ bool	dispatcher_register(t_Dispatcher *dispatcher, t_CommandId id, t_Fn fn)
 	return (true);
 }
 
-bool	dispatcher_exec(t_Dispatcher *dispatcher, t_CommandCtx *ctx, const t_Command *cmd)
+bool	dispatcher_exec(t_Dispatcher *dispatcher, t_Manager *manager, const t_Command *cmd)
 {
 	t_Fn		_fn;
 	bool		state;
 
-	if (NULL == dispatcher || NULL == ctx || NULL == cmd)
+	if (NULL == dispatcher || NULL == manager || NULL == cmd)
 		return (false);
 	_fn = search_function(dispatcher, cmd->id);
 	if (NULL == _fn)
 		return (false);
-	state = _fn(ctx, cmd);
+	state = _fn(manager, cmd);
 	return (state);
 }

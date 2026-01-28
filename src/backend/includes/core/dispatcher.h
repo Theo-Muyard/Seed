@@ -1,0 +1,81 @@
+#ifndef SEED_DISPATCHER_H
+# define SEED_DISPATCHER_H
+
+# include <sys/types.h>
+# include <stdbool.h>
+# include "core/manager.h"
+
+// +===----- Types -----===+ //
+
+typedef enum	e_CommandId
+{
+	CMD_WRITING_CREATE_BUFFER,
+	CMD_WRITING_DELETE_BUFFER,
+
+	CMD_WRITING_CREATE_LINE,
+	CMD_WRITING_INSERT_LINE,
+	CMD_WRITING_SPLIT_LINE,
+	CMD_WRITING_JOIN_LINE,
+	CMD_WRITING_DELETE_LINE,
+
+	CMD_WRITING_INSERT_TEXT,
+	CMD_WRITING_DELETE_TEXT,
+}	t_CommandId;
+
+typedef struct	s_Command
+{
+	t_CommandId		id;
+	const void		*payload;
+	size_t			payload_size;
+}	t_Command;
+
+typedef bool (*t_Fn)(t_Manager *manager, const t_Command *cmd);
+
+typedef struct	s_CommandEntry
+{
+	t_CommandId		id;
+	t_Fn			fn;
+}	t_CommandEntry;
+
+typedef struct s_Dispatcher
+{
+	size_t			count;
+	size_t			capacity;
+	t_CommandEntry	*commands;
+}	t_Dispatcher;
+
+// +===----- Functions -----===+ //
+
+/**
+ * @brief Register the command with his function.
+ * @param capacity The number of commands that will be contains.
+ * @return TRUE for success or FALSE if an error occured.
+*/
+t_Dispatcher	*dispatcher_create(size_t capacity);
+
+/**
+ * @brief Destroy the dispatcher.
+ * @param dispatcher The dispatcher that will contains commands.
+ * @return TRUE for success or FALSE if an error occured.
+*/
+bool	dispatcher_destroy(t_Dispatcher *dispatcher);
+
+/**
+ * @brief Register the command with his function.
+ * @param dispatcher The dispatcher that will contains commands.
+ * @param id The id of the command.
+ * @param function The function to execute for the given command.
+ * @return TRUE for success or FALSE if an error occured.
+*/
+bool	dispatcher_register(t_Dispatcher *dispatcher, t_CommandId id, t_Fn fn);
+
+/**
+ * @brief Execute the function of the specified command.
+ * @param dispatcher The dispatcher that will contains commands.
+ * @param manager The manager that will contains contexts.
+ * @param cmd The content of the command.
+ * @return TRUE for success or FALSE if an error occured.
+*/
+bool	dispatcher_exec(t_Dispatcher *dispatcher, t_Manager *manager, const t_Command *cmd);
+
+#endif

@@ -1,10 +1,10 @@
-#ifndef SEED_WRITING_H
-# define SEED_WRITING_H
+#ifndef SEED_WRITING_INTERNAL_H
+# define SEED_WRITING_INTERNAL_H
 
-# include <unistd.h>
+# include <sys/types.h>
 # include <stdbool.h>
 
-// +===----- TYPES -----===+ //
+// +===----- Types -----===+ //
 
 typedef struct	s_Line
 {
@@ -15,13 +15,13 @@ typedef struct	s_Line
 	struct s_Line	*next;
 }	t_Line;
 
-typedef struct s_Buffer
+typedef struct	s_Buffer
 {
 	t_Line	*line;
 	ssize_t	size;
 }	t_Buffer;
 
-// +===----- BUFFER -----===+ //
+// +===----- Buffer -----===+ //
 
 /**
  * @brief Creates a new empty buffer.
@@ -35,10 +35,7 @@ t_Buffer	*buffer_create(void);
 */
 void		buffer_destroy(t_Buffer *buffer);
 
-// TODO: DELETE (DEBUG)
-bool		buffer_check(t_Buffer *b);
-
-// +===----- LINES -----===+ //
+// +===----- Lines -----===+ //
 
 /**
  * @brief Creates a new empty line.
@@ -79,7 +76,15 @@ t_Line		*buffer_line_split(t_Buffer *buffer, t_Line *line, size_t index);
 */
 t_Line		*buffer_line_join(t_Buffer *buffer, t_Line *dst, t_Line *src);
 
-// +===----- DATA -----===+ //
+/**
+ * @brief Get the line of the given index.
+ * @param buffer The buffer that contains lines.
+ * @param index The index of the line.
+ * @return The desired line.
+*/
+t_Line		*buffer_get_line(t_Buffer *buffer, ssize_t index);
+
+// +===----- Data -----===+ //
 
 /**
  * @brief Add the data to the given line.

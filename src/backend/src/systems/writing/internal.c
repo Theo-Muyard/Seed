@@ -1,14 +1,10 @@
 #include <stdlib.h>
 #include <string.h>
-#include "writing.h"
+#include "systems/writing/internal.h"
 
-#define DATA_ALLOC 128
+#define DATA_ALLOC 256
 
-/*
-==============================================================
-                            BUFFER
-==============================================================
-*/
+// +===----- BUFFER -----===+ //
 
 t_Buffer	*buffer_create(void)
 {
@@ -37,28 +33,7 @@ void		buffer_destroy(t_Buffer *buffer)
 	free(buffer);
 }
 
-// TODO: DELETE (DEBUG)
-bool		buffer_check(t_Buffer *b)
-{
-	size_t count = 0;
-	t_Line *l = b->line;
-
-	while (l)
-	{
-		if (l->next && l->next->prev != l)
-			return false;
-		count++;
-		l = l->next;
-	}
-	return (count == (size_t)b->size);
-}
-
-
-/*
-==============================================================
-                            LINES
-==============================================================
-*/
+// +===----- LINES -----===+ //
 
 t_Line		*line_create(void)
 {
@@ -177,11 +152,25 @@ t_Line		*buffer_line_join(t_Buffer *buffer, t_Line *dst, t_Line *src)
 	return (dst);
 }
 
-/*
-==============================================================
-                            DATA
-==============================================================
-*/
+t_Line		*buffer_get_line(t_Buffer *buffer, ssize_t index)
+{
+	t_Line	*_tmp;
+	size_t	_i;
+
+	if (NULL == buffer || index >= buffer->size)
+		return (NULL);
+	
+	if (index < 0)
+		index = buffer->size;
+
+	_tmp = buffer->line;
+	_i = 0;
+	while (_tmp && _i < index)
+		_tmp = _tmp->next;
+	return (_tmp);
+}
+
+// +===----- DATA -----===+ //
 
 bool		line_add_data(t_Line *line, ssize_t column, size_t size, const char *data)
 {

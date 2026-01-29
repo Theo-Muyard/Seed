@@ -3,30 +3,11 @@
 
 # include <sys/types.h>
 # include <stdbool.h>
+# include "seed.h"
 
 // +===----- Types -----===+ //
 
-typedef enum	e_CommandId
-{
-	CMD_WRITING_CREATE_BUFFER,
-	CMD_WRITING_DELETE_BUFFER,
-
-	CMD_WRITING_INSERT_LINE,
-	CMD_WRITING_DELETE_LINE,
-	CMD_WRITING_SPLIT_LINE,
-	CMD_WRITING_JOIN_LINE,
-	CMD_WRITING_GET_LINE,
-
-	CMD_WRITING_INSERT_TEXT,
-	CMD_WRITING_DELETE_TEXT,
-}	t_CommandId;
-
-typedef struct	s_Command
-{
-	t_CommandId		id;
-	void			*payload;
-	size_t			payload_size;
-}	t_Command;
+typedef struct s_Command	t_Command;
 
 typedef bool	(*t_Fn)(t_Manager *manager, const t_Command *cmd);
 

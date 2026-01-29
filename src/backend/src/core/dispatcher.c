@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include "seed.h"
 #include "core/manager.h"
 #include "core/dispatcher.h"
 

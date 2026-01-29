@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include "core/manager.h"
-#include "dispatcher.h"
+#include "core/dispatcher.h"
 #include "systems/writing/_internal.h"
 #include "systems/writing/commands.h"
 #include "systems/writing/system.h"

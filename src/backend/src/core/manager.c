@@ -3,6 +3,8 @@
 #include "core/dispatcher.h"
 #include "systems/writing/system.h"
 
+// +===----- Functions -----===+ //
+
 t_Manager	*manager_init(void)
 {
 	t_Manager		*manager;

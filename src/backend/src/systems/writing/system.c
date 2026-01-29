@@ -1,12 +1,28 @@
 #include <stdlib.h>
 #include "core/manager.h"
 #include "core/dispatcher.h"
+#include "systems/writing/_internal.h"
 #include "systems/writing/system.h"
-#include "systems/writing/commands.h"
+
+// +===----- Commands Definition -----===+ //
+
+const t_CommandEntry	writing_commands[] = {
+	{ CMD_WRITING_CREATE_BUFFER,	cmd_buffer_create},
+	{ CMD_WRITING_DELETE_BUFFER,	cmd_buffer_destroy},
+
+	{ CMD_WRITING_INSERT_LINE,		cmd_buffer_line_insert},
+	{ CMD_WRITING_DELETE_LINE,		cmd_buffer_line_destroy},
+	{ CMD_WRITING_SPLIT_LINE,		cmd_buffer_line_split},
+	{ CMD_WRITING_JOIN_LINE,		cmd_buffer_line_join},
+	{ CMD_WRITING_GET_LINE,			cmd_buffer_get_line},
+
+	{ CMD_WRITING_INSERT_TEXT,		cmd_line_add_data},
+	{ CMD_WRITING_DELETE_TEXT,		cmd_line_delete_data},
+};
 
 static bool	register_commands(t_Dispatcher *dispatcher, const t_CommandEntry *commands, size_t size)
 {
-	int	_i;
+	size_t	_i;
 
 	_i = 0;
 	while (_i < size)
@@ -21,7 +37,6 @@ static bool	register_commands(t_Dispatcher *dispatcher, const t_CommandEntry *co
 bool	writing_init(t_Manager	*manager)
 {
 	t_WritingCtx		*_ctx;
-	t_Dispatcher		*_dispatcher;
 
 	if (NULL == manager)
 		return (false);
@@ -36,30 +51,28 @@ bool	writing_init(t_Manager	*manager)
 	if (false == register_commands(
 		manager->dispatcher,
 		writing_commands,
-		sizeof(writing_commands) / sizeof(*writing_commands)
+		WRITING_COMMANDS_COUNT
 	))
 		return (free(_ctx), false);
 	manager->writing_ctx = _ctx;
 	return (true);
 }
 
-void	writing_clean(t_Manager	*manager)
+void	writing_clean(t_WritingCtx *ctx)
 {
-	t_WritingCtx	*_ctx;
-	int				_i;
+	size_t	_i;
 
-	if (NULL == manager)
+	if (NULL == ctx)
 		return ;
-	_ctx = manager->writing_ctx;
 	_i = 0;
-	while (_i < _ctx->count)
+	while (_i < ctx->count)
 	{
-		buffer_destroy(_ctx->buffers[_i]);
+		buffer_destroy(ctx->buffers[_i]);
 		_i++;
 	}
-	free(_ctx->buffers);
-	_ctx->buffers = NULL;
-	_ctx->count = 0;
-	_ctx->capacity = 0;
-	free(_ctx);
+	free(ctx->buffers);
+	ctx->buffers = NULL;
+	ctx->count = 0;
+	ctx->capacity = 0;
+	free(ctx);
 }

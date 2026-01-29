@@ -24,7 +24,7 @@ typedef enum	e_CommandId
 typedef struct	s_Command
 {
 	t_CommandId		id;
-	const void		*payload;
+	void			*payload;
 	size_t			payload_size;
 }	t_Command;
 

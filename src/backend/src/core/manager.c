@@ -11,7 +11,7 @@ t_Manager	*manager_init(void)
 	manager = malloc(sizeof(t_Manager));
 	if (NULL == manager)
 		return (NULL);
-	_size = sizeof(writing_commands) / sizeof(*writing_commands);
+	_size = WRITING_COMMANDS_COUNT;
 	if (false == dispatcher_init(manager, _size))
 		return (manager_clean(manager), NULL);
 	if (false == writing_init(manager))
@@ -25,6 +25,7 @@ void		manager_clean(t_Manager *manager)
 		return ;
 	dispatcher_clean(manager->dispatcher);
 	writing_clean(manager->writing_ctx);
+	free(manager);
 }
 
 bool		manager_exec(t_Manager *manager, t_Command *cmd)

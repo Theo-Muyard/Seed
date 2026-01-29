@@ -2,7 +2,7 @@
 # 						NAMES
 # | ================================================ |
 
-NAME		=	seed_core
+NAME		=	seed_core.a
 TEST		=	seed_test
 BUILD_DIR	=	build
 
@@ -12,20 +12,25 @@ BUILD_DIR	=	build
 
 CC			=	cc
 CFLAGS		=	-Wall -Wextra -Werror -g3
+AR			=	ar
+FLAGS		=	rcs
 
 # | ================================================ |
 # 					INCLUDES
 # | ================================================ |
 
-INCLUDES	=	-I includes -I includes/systems
+INCLUDES	=	-I includes -I includes/core -I includes/systems/writing
 
 # | ================================================ |
 # 					SOURCE FILES
 # | ================================================ |
 
-SRC			=	main.c \
+SRC			=	core/manager.c \
+				core/dispatcher.c \
 \
-				systems/writing.c
+				systems/writing/_internal.c \
+				systems/writing/commands.c \
+				systems/writing/system.c
 
 # | ================================================ |
 # 					OBJ FILES
@@ -50,7 +55,7 @@ WHITE		=	\033[37m
 all: $(NAME)
 
 $(NAME): $(BUILD_DIR) $(OBJ)
-	@$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
+	@$(AR) $(FLAGS) $(NAME) $(OBJ)
 	@echo "$(GREEN)Done$(WHITE)."
 
 # | ================================================ |

@@ -155,7 +155,7 @@ t_Line		*buffer_line_join(t_Buffer *buffer, t_Line *dst, t_Line *src)
 t_Line		*buffer_get_line(t_Buffer *buffer, ssize_t index)
 {
 	t_Line	*_tmp;
-	size_t	_i;
+	ssize_t	_i;
 
 	if (NULL == buffer || index >= buffer->size)
 		return (NULL);
@@ -166,7 +166,10 @@ t_Line		*buffer_get_line(t_Buffer *buffer, ssize_t index)
 	_tmp = buffer->line;
 	_i = 0;
 	while (_tmp && _i < index)
+	{
 		_tmp = _tmp->next;
+		_i++;
+	}
 	return (_tmp);
 }
 

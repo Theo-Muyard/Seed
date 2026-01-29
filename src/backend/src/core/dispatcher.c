@@ -55,7 +55,7 @@ void	dispatcher_clean(t_Dispatcher *dispatcher)
 bool	dispatcher_register(t_Dispatcher *dispatcher, t_CommandId id, t_Fn fn)
 {
 	t_CommandEntry	_entry;
-	ssize_t			_count;
+	size_t			_count;
 
 	if (NULL == dispatcher || NULL == fn)
 		return (false);

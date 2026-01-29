@@ -2,6 +2,7 @@
 # define SEED_WRITING_SYSTEM_H
 
 # include <stdbool.h>
+# include "systems/writing/commands.h"
 
 // +===----- Types -----===+ //
 
@@ -18,19 +19,9 @@ typedef struct s_WritingCtx
 
 // +===----- Commands -----===+ //
 
-const t_CommandEntry	writing_commands[] = {
-	{ CMD_WRITING_CREATE_BUFFER,	cmd_buffer_create},
-	{ CMD_WRITING_DELETE_BUFFER,	cmd_buffer_destroy},
+#define WRITING_COMMANDS_COUNT 9
 
-	{ CMD_WRITING_INSERT_LINE,		cmd_buffer_line_insert},
-	{ CMD_WRITING_DELETE_LINE,		cmd_buffer_line_destroy},
-	{ CMD_WRITING_SPLIT_LINE,		cmd_buffer_line_split},
-	{ CMD_WRITING_JOIN_LINE,		cmd_buffer_line_join},
-	{ CMD_WRITING_GET_LINE,			cmd_buffer_get_line},
-
-	{ CMD_WRITING_INSERT_TEXT,		cmd_line_add_data},
-	{ CMD_WRITING_DELETE_TEXT,		cmd_line_delete_data},
-};
+extern const t_CommandEntry	writing_commands[];
 
 // +===----- Functions -----===+ //
 
@@ -43,8 +34,8 @@ bool	writing_init(t_Manager	*manager);
 
 /**
  * @brief Clean the writing system.
- * @param manager The seed core manager.
+ * @param ctx The writing context.
 */
-void	writing_clean(t_Manager	*manager);
+void	writing_clean(t_WritingCtx *ctx);
 
 #endif

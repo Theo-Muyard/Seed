@@ -4,6 +4,7 @@
 
 NAME				=	seed_test
 BUILD_DIR			=	build/tests
+SEED_ARCHIVE		=	seed_core.a
 
 # | ================================================ |
 # 					COMPILATION
@@ -21,12 +22,21 @@ INCLUDES			=	-I includes -I includes/systems
 # 					SOURCE FILES
 # | ================================================ |
 
-WRITING_SRC			=	src/systems/writing.c \
-						tests/systems/TEST_writing.c
+MANAGER_SRC			=	tests/core/TEST_manager.c
+
+DISPATCHER_SRC		=	tests/core/TEST_dispatcher.c
+
+WRITING_SRC			=	tests/systems/writing/TEST_writing_internal.c \
+						tests/systems/writing/TEST_writing_commands.c \
+						tests/systems/writing/TEST_writing_main.c
 
 # | ================================================ |
 # 					OBJ FILES
 # | ================================================ |
+
+MANAGER_OBJ			=	$(addprefix $(BUILD_DIR)/, $(notdir $(MANAGER_SRC:.c=.o)))
+
+DISPATCHER_OBJ		=	$(addprefix $(BUILD_DIR)/, $(notdir $(DISPATCHER_SRC:.c=.o)))
 
 WRITING_OBJ			=	$(addprefix $(BUILD_DIR)/, $(notdir $(WRITING_SRC:.c=.o)))
 
@@ -44,10 +54,7 @@ WHITE		=	\033[37m
 # 					TEST FUNCTION
 # | ================================================ |
 
-define TEST_RULE
-$1: OBJ := $2
-$1: $(NAME)
-endef
+# No macro needed, just direct rules
 
 # | ================================================ |
 # 					COMPILE FUNCTION
@@ -66,24 +73,28 @@ endef
 all:
 	@echo "$(BLUE)Usage$(WHITE): make test TARGET=<target>"
 
-$(NAME): $(BUILD_DIR) $(WRITING_OBJ)
-	@$(CC) $(CFLAGS) $(WRITING_OBJ) -o $(NAME)
-	@echo "$(GREEN)Done$(WHITE)."
-
 # | ================================================ |
 # 					RUN RULE
 # | ================================================ |
 
 run:
-	@echo "$(BLUE)Run$(WHITE) the test...\n"
 	./$(NAME)
-	@echo "\nTest $(RED)ended$(WHITE)."
 
 # | ================================================ |
-# 					WRITING RULE
+# 					TEST TARGETS
 # | ================================================ |
 
-$(eval $(call TEST_RULE, writing, $(WRITING_OBJ)))
+manager: $(MANAGER_OBJ)
+	@$(CC) $(CFLAGS) $(MANAGER_OBJ) $(SEED_ARCHIVE) -o $(NAME)
+	@echo "$(GREEN)Done$(WHITE)."
+
+dispatcher: $(DISPATCHER_OBJ)
+	@$(CC) $(CFLAGS) $(DISPATCHER_OBJ) $(SEED_ARCHIVE) -o $(NAME)
+	@echo "$(GREEN)Done$(WHITE)."
+
+writing: $(WRITING_OBJ)
+	@$(CC) $(CFLAGS) $(WRITING_OBJ) $(SEED_ARCHIVE) -o $(NAME)
+	@echo "$(GREEN)Done$(WHITE)."
 
 # | ================================================ |
 # 					DIRECTORY
@@ -97,6 +108,8 @@ $(BUILD_DIR):
 # 					OBJECTS
 # | ================================================ |
 
+$(foreach src, $(MANAGER_SRC), $(eval $(call COMPILE_OBJ,$(src))))
+$(foreach src, $(DISPATCHER_SRC), $(eval $(call COMPILE_OBJ,$(src))))
 $(foreach src, $(WRITING_SRC), $(eval $(call COMPILE_OBJ,$(src))))
 
-.PHONY: all run writing
+.PHONY: all run manager dispatcher writing

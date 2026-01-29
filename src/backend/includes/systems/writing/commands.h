@@ -15,7 +15,7 @@ typedef struct s_Command	t_Command;
  * @param cmd The content of the command.
  * @return TRUE for success or FALSE if an error occured.
 */
-bool	cmd_buffer_create(t_Manager *manager, t_Command *cmd);
+bool	cmd_buffer_create(t_Manager *manager, const t_Command *cmd);
 
 typedef struct	s_CmdCreateBuffer
 {
@@ -28,7 +28,7 @@ typedef struct	s_CmdCreateBuffer
  * @param cmd The content of the command.
  * @return TRUE for success or FALSE if an error occured.
 */
-bool	cmd_buffer_destroy(t_Manager *manager, t_Command *cmd);
+bool	cmd_buffer_destroy(t_Manager *manager, const t_Command *cmd);
 
 typedef struct	s_CmdDestroyBuffer
 {
@@ -43,7 +43,7 @@ typedef struct	s_CmdDestroyBuffer
  * @param cmd The content of the command.
  * @return TRUE for success or FALSE if an error occured.
 */
-bool	cmd_buffer_line_insert(t_Manager *manager, t_Command *cmd);
+bool	cmd_buffer_line_insert(t_Manager *manager, const t_Command *cmd);
 
 typedef struct	s_CmdInsertLine
 {
@@ -57,7 +57,7 @@ typedef struct	s_CmdInsertLine
  * @param cmd The content of the command.
  * @return TRUE for success or FALSE if an error occured.
 */
-bool	cmd_buffer_line_destroy(t_Manager *manager, t_Command *cmd);
+bool	cmd_buffer_line_destroy(t_Manager *manager, const t_Command *cmd);
 
 typedef struct	s_CmdDestroyLine
 {
@@ -72,7 +72,7 @@ typedef struct	s_CmdDestroyLine
  * @param cmd The content of the command.
  * @return TRUE for success or FALSE if an error occured.
 */
-bool	cmd_buffer_line_split(t_Manager *manager, t_Command *cmd);
+bool	cmd_buffer_line_split(t_Manager *manager, const t_Command *cmd);
 
 typedef struct	s_CmdSplitLine
 {
@@ -87,7 +87,7 @@ typedef struct	s_CmdSplitLine
  * @param cmd The content of the command.
  * @return TRUE for success or FALSE if an error occured.
 */
-bool	cmd_buffer_line_join(t_Manager *manager, t_Command *cmd);
+bool	cmd_buffer_line_join(t_Manager *manager, const t_Command *cmd);
 
 typedef struct	s_CmdJoinLine
 {
@@ -103,7 +103,7 @@ typedef struct	s_CmdJoinLine
  * @param cmd The content of the command.
  * @return TRUE for success or FALSE if an error occured.
 */
-bool	cmd_buffer_get_line(t_Manager *manager, t_Command *cmd);
+bool	cmd_buffer_get_line(t_Manager *manager, const t_Command *cmd);
 
 typedef struct	s_CmdGetLine
 {
@@ -121,7 +121,7 @@ typedef struct	s_CmdGetLine
  * @param cmd The content of the command.
  * @return TRUE for success or FALSE if an error occured.
 */
-bool	cmd_line_add_data(t_Manager *manager, t_Command *cmd);
+bool	cmd_line_add_data(t_Manager *manager, const t_Command *cmd);
 
 typedef struct	s_CmdAddData
 {
@@ -138,7 +138,7 @@ typedef struct	s_CmdAddData
  * @param cmd The content of the command.
  * @return TRUE for success or FALSE if an error occured.
 */
-bool	cmd_line_delete_data(t_Manager *manager, t_Command *cmd);
+bool	cmd_line_delete_data(t_Manager *manager, const t_Command *cmd);
 
 typedef struct	s_CmdDeleteData
 {

@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-#include "systems/writing/internal.h"
+#include "systems/writing/_internal.h"
 
 #define DATA_ALLOC 256
 
@@ -161,7 +161,7 @@ t_Line		*buffer_get_line(t_Buffer *buffer, ssize_t index)
 		return (NULL);
 	
 	if (index < 0)
-		index = buffer->size;
+		index = buffer->size - 1;
 
 	_tmp = buffer->line;
 	_i = 0;

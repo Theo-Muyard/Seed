@@ -3,7 +3,6 @@
 
 # include <sys/types.h>
 # include <stdbool.h>
-# include "core/manager.h"
 
 // +===----- Types -----===+ //
 
@@ -12,11 +11,11 @@ typedef enum	e_CommandId
 	CMD_WRITING_CREATE_BUFFER,
 	CMD_WRITING_DELETE_BUFFER,
 
-	CMD_WRITING_CREATE_LINE,
 	CMD_WRITING_INSERT_LINE,
+	CMD_WRITING_DELETE_LINE,
 	CMD_WRITING_SPLIT_LINE,
 	CMD_WRITING_JOIN_LINE,
-	CMD_WRITING_DELETE_LINE,
+	CMD_WRITING_GET_LINE,
 
 	CMD_WRITING_INSERT_TEXT,
 	CMD_WRITING_DELETE_TEXT,
@@ -29,7 +28,7 @@ typedef struct	s_Command
 	size_t			payload_size;
 }	t_Command;
 
-typedef bool (*t_Fn)(t_Manager *manager, const t_Command *cmd);
+typedef bool	(*t_Fn)(t_Manager *manager, const t_Command *cmd);
 
 typedef struct	s_CommandEntry
 {
@@ -48,16 +47,17 @@ typedef struct s_Dispatcher
 
 /**
  * @brief Register the command with his function.
+ * @param manager The manager that will contains contexts.
  * @param capacity The number of commands that will be contains.
  * @return TRUE for success or FALSE if an error occured.
 */
-t_Dispatcher	*dispatcher_create(size_t capacity);
+bool	dispatcher_init(t_Manager *manager, size_t capacity);
 
 /**
- * @brief Destroy the dispatcher.
+ * @brief Clean the dispatcher.
  * @param dispatcher The dispatcher that will contains commands.
 */
-void	dispatcher_destroy(t_Dispatcher *dispatcher);
+void	dispatcher_clean(t_Dispatcher *dispatcher);
 
 /**
  * @brief Register the command with his function.
@@ -70,11 +70,10 @@ bool	dispatcher_register(t_Dispatcher *dispatcher, t_CommandId id, t_Fn fn);
 
 /**
  * @brief Execute the function of the specified command.
- * @param dispatcher The dispatcher that will contains commands.
  * @param manager The manager that will contains contexts.
  * @param cmd The content of the command.
  * @return TRUE for success or FALSE if an error occured.
 */
-bool	dispatcher_exec(t_Dispatcher *dispatcher, t_Manager *manager, const t_Command *cmd);
+bool	dispatcher_exec(t_Manager *manager, const t_Command *cmd);
 
 #endif

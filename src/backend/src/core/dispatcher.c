@@ -1,5 +1,6 @@
 #include <stdlib.h>
-#include "dispatcher.h"
+#include "core/manager.h"
+#include "core/dispatcher.h"
 
 /**
  * @brief Search for the function associated with the given ID.
@@ -24,22 +25,23 @@ static t_Fn	search_function(t_Dispatcher *dispatcher, t_CommandId id)
 	return (NULL);
 }
 
-t_Dispatcher	*dispatcher_create(size_t capacity)
+bool	dispatcher_init(t_Manager *manager, size_t capacity)
 {
-	t_Dispatcher	*dispatcher;
+	t_Dispatcher	*_dispatcher;
 
-	dispatcher = malloc(sizeof(t_Dispatcher));
-	if (NULL == dispatcher)
-		return (NULL);
-	dispatcher->count = 0;
-	dispatcher->capacity = capacity;
-	dispatcher->commands = malloc(capacity * sizeof(t_CommandEntry));
-	if (NULL == dispatcher->commands)
-		return (free(dispatcher), NULL);
-	return (dispatcher);
+	_dispatcher = malloc(sizeof(t_Dispatcher));
+	if (NULL == _dispatcher)
+		return (false);
+	_dispatcher->count = 0;
+	_dispatcher->capacity = capacity;
+	_dispatcher->commands = malloc(capacity * sizeof(t_CommandEntry));
+	if (NULL == _dispatcher->commands)
+		return (free(_dispatcher), false);
+	manager->dispatcher = _dispatcher;
+	return (true);
 }
 
-void	dispatcher_destroy(t_Dispatcher *dispatcher)
+void	dispatcher_clean(t_Dispatcher *dispatcher)
 {
 	if (NULL == dispatcher)
 		return ;
@@ -69,14 +71,14 @@ bool	dispatcher_register(t_Dispatcher *dispatcher, t_CommandId id, t_Fn fn)
 	return (true);
 }
 
-bool	dispatcher_exec(t_Dispatcher *dispatcher, t_Manager *manager, const t_Command *cmd)
+bool	dispatcher_exec(t_Manager *manager, const t_Command *cmd)
 {
 	t_Fn		_fn;
 	bool		state;
 
-	if (NULL == dispatcher || NULL == manager || NULL == cmd)
+	if (NULL == manager || NULL == manager->dispatcher|| NULL == cmd)
 		return (false);
-	_fn = search_function(dispatcher, cmd->id);
+	_fn = search_function(manager->dispatcher, cmd->id);
 	if (NULL == _fn)
 		return (false);
 	state = _fn(manager, cmd);

@@ -245,7 +245,6 @@ static int	test_cmd_line_destroy(void)
 	// Delete middle line (index 1)
 	_destroy_payload.buffer_id = _buffer_id;
 	_destroy_payload.line = 1;
-	_destroy_payload.column = 0;
 	_cmd.id = CMD_WRITING_DELETE_LINE;
 	_cmd.payload = &_destroy_payload;
 	_cmd.payload_size = sizeof(t_CmdDestroyLine);

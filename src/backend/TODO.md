@@ -24,17 +24,16 @@
 
 **Impact:** Homogénéité, lisibilité, cohérence globale
 
-- ⬜ **Audit complet des noms publics**
+- 🟨 **Audit complet des noms publics**
   - [ ] Analyser tous les symboles exposés dans `seed.h`
-  - [ ] Vérifier les conventions de nommage (snake_case, préfixes)
-  - [ ] Documenter les incohérences trouvées
+  - [ ] Ajouter / vérifier les conventions de nommage (snake_case, préfixes)
+  - [ ] Documenter / modifier les incohérences trouvées
   - [ ] Créer une table de migration
 
-- ⬜ **Normaliser les préfixes**
-  - [ ] Vérifier que les fonctions `manager_*` sont bien préfixées
-  - [ ] Vérifier que les fonctions `dispatcher_*` sont bien préfixées
-  - [ ] Vérifier que les fonctions de writing suivent la convention
-  - [ ] S'assurer que les structures ont le préfixe `t_`
+- ⬜ **Normaliser le code**
+  - [ ] Prefixer les fonctions / emums de leur contexte (`manager_*`, `dispatcher_*`, etc...)
+  - [ ] Ajouter / verifier la norme des systemes (internal,  commandes, system)
+  - [ ] S'assurer que les structures ont le préfixe `t_`, les enums `e_`, les structure `s_`
 
 - ⬜ **Homogénéiser les conventions de paramètres**
   - [ ] Les erreurs / status toujours en dernier paramètre?
@@ -44,7 +43,6 @@
 
 - ⬜ **Renommer et migrer progressivement**
   - [ ] Lister les changements de noms (old → new)
-  - [ ] Créer des wrappers rétro-compatibles (avec `deprecated`)
   - [ ] Migrer les tests
   - [ ] Migrer les examples/docs
   - [ ] Retirer les anciens noms
@@ -56,26 +54,15 @@
 **Impact:** Debuggage facile, traçabilité, contrôle d'erreur
 
 - ⬜ **Concevoir la structure d'erreur**
-  - [ ] Créer un enum `t_ErrorCode` avec tous les codes possibles
-  - [ ] Ajouter des codes pour chaque système (Manager, Dispatcher, Writing, FS)
+  - [ ] Créer un enum `t_ErrorCode` avec tous les codes d'erreurs possibles
+  - [ ] Ajouter des codes pour chaque système (Manager, Dispatcher, Writing, FileSystem, etc...)
   - [ ] Ajouter des codes pour les erreurs communes (allocation, validation, etc)
-  - [ ] Exemple : `SEED_ERR_BUFFER_NOT_FOUND`, `SEED_ERR_INVALID_PAYLOAD`, etc
+  - [ ] Exemple : `ERR_BUFFER_NOT_FOUND`, `ERR_INVALID_PAYLOAD`, etc
 
 - ⬜ **Créer la structure de retour**
   - [ ] Définir `t_Result` ou `t_Status` (avec code + message optionnel)
   - [ ] Ou créer des fonctions qui remplissent une `t_Error` en output
   - [ ] Décider: retour booléen → retour structuré ou output param?
-  - [ ] Maintenir la rétro-compatibilité si possible
-
-- ⬜ **Ajouter des messages d'erreur détaillés**
-  - [ ] Créer un système de lookup pour codes → messages humains
-  - [ ] Supporter multi-langue (optionnel pour v0.2)
-  - [ ] Exemple : `SEED_ERR_BUFFER_NOT_FOUND` → "Buffer not found: id=42"
-
-- ⬜ **Logger les stacktraces d'erreurs**
-  - [ ] Ajouter un système de logging optionnel
-  - [ ] Logger ligne + fonction + code erreur
-  - [ ] Utiliser pour le debug sans pollution du code
 
 - ⬜ **Mettre à jour toutes les fonctions**
   - [ ] Manager : `manager_exec()`, `manager_init()`, etc
@@ -125,8 +112,8 @@
 **Impact:** Persistance, import/export, intégration système
 
 - ⬜ **Spécifier l'API de fichiers**
-  - [ ] Créer les headers `includes/systems/filesystem.h`
-  - [ ] Définir les opérations : open, save, close, delete
+  - [ ] Créer les headers `includes/systems/filesystem`
+  - [ ] Définir les opérations : create, delete, open, save, close
   - [ ] Supporter les chemins absolus et relatifs
   - [ ] Supporter encodage UTF-8 minimum
 
@@ -148,7 +135,7 @@
   - [ ] `filesystem_close(file_handle)`
   - [ ] Nettoyer les ressources
   - [ ] Optionnel: sauvegarder avant fermeture?
-  - [ ] Optionnel: demander confirmation si modifié
+  - [ ] Optionnel: demander confirmation si modifié?
 
 - ⬜ **Intégration avec le Manager**
   - [ ] Ajouter les commandes filesystem au dispatcher

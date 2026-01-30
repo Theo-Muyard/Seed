@@ -11,14 +11,24 @@
 
 typedef struct s_Manager	t_Manager;
 
-// TODO: Ajouter code d'erreur globalement
 typedef enum	e_ErrorCode
 {
+	ERR_SUCCESS = 0,
+
 	ERR_INTERNAL_MEMORY,
+	ERR_OPERATION_FAILED,
+	ERR_PERMISSION_DENIED,
+
 	ERR_INVALID_MANAGER,
 	ERR_INVALID_PAYLOAD,
+	ERR_INVALID_COMMAND,
+	ERR_INVALID_COMMAND_ID,
+
+	ERR_DISPATCHER_NOT_INITIALIZED,
+	ERR_WRITING_CONTEXT_NOT_INITIALIZED,
+	ERR_BUFFER_NOT_FOUND,
+	ERR_LINE_NOT_FOUND,
 }	t_ErrorCode;
-// END TODO
 
 typedef enum	e_CommandId
 {
@@ -58,19 +68,19 @@ typedef struct	s_CmdDestroyBuffer
 typedef struct	s_CmdInsertLine
 {
 	size_t	buffer_id;
-	size_t	line;
+	ssize_t	line;
 }	t_CmdInsertLine;
 
 typedef struct	s_CmdDeleteLine
 {
 	size_t	buffer_id;
-	size_t	line;
+	ssize_t	line;
 }	t_CmdDeleteLine;
 
 typedef struct	s_CmdSplitLine
 {
 	size_t	buffer_id;
-	size_t	line;
+	ssize_t	line;
 	size_t	index;
 }	t_CmdSplitLine;
 
@@ -83,8 +93,8 @@ typedef struct	s_CmdJoinLine
 
 typedef struct	s_CmdGetLine
 {
-	size_t	buffer_id;
-	size_t	line;
+	size_t		buffer_id;
+	ssize_t		line;
 	const char	*out_data;
 	size_t		out_len;
 }	t_CmdGetLine;
@@ -92,8 +102,8 @@ typedef struct	s_CmdGetLine
 typedef struct	s_CmdInsertData
 {
 	size_t	buffer_id;
-	size_t	line;
-	size_t	column;
+	ssize_t	line;
+	ssize_t	column;
 	size_t	size;
 	char	*data;
 }	t_CmdInsertData;
@@ -101,7 +111,7 @@ typedef struct	s_CmdInsertData
 typedef struct	s_CmdDeleteData
 {
 	size_t	buffer_id;
-	size_t	line;
+	ssize_t	line;
 	size_t	column;
 	size_t	size;
 }	t_CmdDeleteData;
@@ -124,8 +134,8 @@ void		manager_clean(t_Manager *manager);
  * @brief Clean the seed core manager.
  * @param manager The manager.
  * @param cmd The command content.
- * @return TRUE for success or FALSE if an error occured.
+ * @return An error code or SUCCESS (=0).
 */
-bool		manager_exec(t_Manager *manager, t_Command *cmd);
+t_ErrorCode	manager_exec(t_Manager *manager, t_Command *cmd);
 
 #endif

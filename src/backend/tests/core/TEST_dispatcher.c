@@ -31,18 +31,18 @@ static void	print_error(const char *message)
 
 // +===----- Test Command Handlers -----===+ //
 
-static bool	test_handler_success(t_Manager *manager, const t_Command *cmd)
+static t_ErrorCode	test_handler_success(t_Manager *manager, const t_Command *cmd)
 {
 	(void)manager;
 	(void)cmd;
-	return (true);
+	return (ERR_SUCCESS);
 }
 
-static bool	test_handler_failure(t_Manager *manager, const t_Command *cmd)
+static t_ErrorCode	test_handler_failure(t_Manager *manager, const t_Command *cmd)
 {
 	(void)manager;
 	(void)cmd;
-	return (false);
+	return (ERR_OPERATION_FAILED);
 }
 
 // +===----- Test Cases -----===+ //
@@ -145,7 +145,7 @@ static int	test_dispatcher_exec(void)
 	_cmd.id = CMD_WRITING_CREATE_BUFFER;
 	_cmd.payload = NULL;
 
-	if (false == dispatcher_exec(_manager, &_cmd))
+	if (dispatcher_exec(_manager, &_cmd))
 		return (print_error("Failed to execute registered command"), 1);
 	print_success("Executed CMD_WRITING_CREATE_BUFFER successfully");
 
@@ -153,16 +153,16 @@ static int	test_dispatcher_exec(void)
 		return (print_error("Failed to register failure handler"), 1);
 
 	_cmd.id = CMD_WRITING_DELETE_BUFFER;
-	if (true == dispatcher_exec(_manager, &_cmd))
+	if (!dispatcher_exec(_manager, &_cmd))
 		return (print_error("Should propagate handler failure"), 1);
 	print_success("Correctly propagated handler failure");
 
 	_cmd.id = CMD_WRITING_INSERT_LINE;
-	if (true == dispatcher_exec(_manager, &_cmd))
+	if (!dispatcher_exec(_manager, &_cmd))
 		return (print_error("Should fail on unknown command"), 1);
 	print_success("Correctly failed on unregistered command");
 
-	if (true == dispatcher_exec(NULL, &_cmd))
+	if (!dispatcher_exec(NULL, &_cmd))
 		return (print_error("Should fail with NULL manager"), 1);
 	print_success("Correctly rejected NULL manager");
 

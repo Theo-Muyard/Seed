@@ -82,7 +82,7 @@ static int	test_manager_buffers(void)
 	_cmd.id = CMD_WRITING_CREATE_BUFFER;
 	_cmd.payload = &_payload;
 	
-	if (false == manager_exec(_manager, &_cmd))
+	if (manager_exec(_manager, &_cmd))
 		return (print_error("Failed to execute create buffer command"), 1);
 	print_success("Buffer creation command executed");
 
@@ -92,7 +92,7 @@ static int	test_manager_buffers(void)
 	_payload2.out_buffer_id = 0;
 	_cmd.payload = &_payload2;
 
-	if (false == manager_exec(_manager, &_cmd))
+	if (manager_exec(_manager, &_cmd))
 		return (print_error("Failed to create second buffer"), 1);
 	print_success("Second buffer created");
 
@@ -129,7 +129,7 @@ static int	test_manager_lines_and_text(void)
 	_cmd.id = CMD_WRITING_CREATE_BUFFER;
 	_cmd.payload = &_create_payload;
 	
-	if (false == manager_exec(_manager, &_cmd))
+	if (manager_exec(_manager, &_cmd))
 		return (print_error("Failed to create buffer"), 1);
 
 	_buffer_id = _create_payload.out_buffer_id;
@@ -138,7 +138,7 @@ static int	test_manager_lines_and_text(void)
 	_insert_line_payload.line = 0;
 	_cmd.id = CMD_WRITING_INSERT_LINE;
 	_cmd.payload = &_insert_line_payload;
-	if (false == manager_exec(_manager, &_cmd))
+	if (manager_exec(_manager, &_cmd))
 		return (print_error("Failed to insert line"), 1);
 	print_success("Line created in buffer");
 
@@ -150,7 +150,7 @@ static int	test_manager_lines_and_text(void)
 
 	_cmd.id = CMD_WRITING_INSERT_TEXT;
 	_cmd.payload = &_add_data_payload;
-	if (false == manager_exec(_manager, &_cmd))
+	if (manager_exec(_manager, &_cmd))
 		return (print_error("Failed to insert text"), 1);
 	print_success("Text inserted: 'Hello World'");
 
@@ -163,7 +163,7 @@ static int	test_manager_lines_and_text(void)
 
 	_cmd.id = CMD_WRITING_DELETE_TEXT;
 	_cmd.payload = &_delete_data_payload;
-	if (false == manager_exec(_manager, &_cmd))
+	if (manager_exec(_manager, &_cmd))
 		return (print_error("Failed to delete text"), 1);
 	print_success("Text deleted");
 
@@ -231,7 +231,7 @@ static int	test_manager_split_join(void)
 
 	_cmd.id = CMD_WRITING_SPLIT_LINE;
 	_cmd.payload = &_split_payload;
-	if (false == manager_exec(_manager, &_cmd))
+	if (manager_exec(_manager, &_cmd))
 		return (print_error("Failed to split line"), 1);
 	print_success("Line split at index 4");
 
@@ -243,7 +243,7 @@ static int	test_manager_split_join(void)
 
 	_cmd.id = CMD_WRITING_JOIN_LINE;
 	_cmd.payload = &_join_payload;
-	if (false == manager_exec(_manager, &_cmd))
+	if (manager_exec(_manager, &_cmd))
 		return (print_error("Failed to join lines"), 1);
 	print_success("Lines joined successfully");
 

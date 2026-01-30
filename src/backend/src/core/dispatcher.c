@@ -72,16 +72,21 @@ bool	dispatcher_register(t_Dispatcher *dispatcher, t_CommandId id, t_Fn fn)
 	return (true);
 }
 
-bool	dispatcher_exec(t_Manager *manager, const t_Command *cmd)
+t_ErrorCode	dispatcher_exec(t_Manager *manager, const t_Command *cmd)
 {
-	t_Fn		_fn;
-	bool		state;
+	t_Fn			_fn;
 
-	if (NULL == manager || NULL == manager->dispatcher|| NULL == cmd)
-		return (false);
+	if (NULL == manager)
+		return (ERR_INVALID_MANAGER);
+	if (NULL == cmd)
+		return (ERR_INVALID_COMMAND);
+	if (NULL == manager->dispatcher)
+		return (ERR_DISPATCHER_NOT_INITIALIZED);
+	if (NULL == cmd->payload)
+		return (ERR_INVALID_PAYLOAD);
+
 	_fn = search_function(manager->dispatcher, cmd->id);
 	if (NULL == _fn)
-		return (false);
-	state = _fn(manager, cmd);
-	return (state);
+		return (ERR_INVALID_COMMAND_ID);
+	return (_fn(manager, cmd));
 }

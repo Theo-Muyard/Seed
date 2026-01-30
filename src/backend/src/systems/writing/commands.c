@@ -15,7 +15,7 @@
  * @param id The id of the buffer.
  * @return TRUE for success or FALSE if an error occured.
 */
-static bool	manage_capacity(t_WritingCtx *ctx, size_t id)
+static t_ErrorCode	manage_capacity(t_WritingCtx *ctx, size_t id)
 {
 	t_Buffer			**_tmp;
 	size_t				_old_cap;
@@ -25,7 +25,7 @@ static bool	manage_capacity(t_WritingCtx *ctx, size_t id)
 	{
 		ctx->buffers = malloc(BUFFER_ALLOC * sizeof(t_Buffer *));
 		if (NULL == ctx->buffers)
-			return (false);
+			return (ERR_INTERNAL_MEMORY);
 		ctx->capacity = BUFFER_ALLOC;
 		for (_i = 0; _i < ctx->capacity; _i++)
 			ctx->buffers[_i] = NULL;
@@ -38,24 +38,22 @@ static bool	manage_capacity(t_WritingCtx *ctx, size_t id)
 			(ctx->capacity + BUFFER_ALLOC) * sizeof(t_Buffer *)
 		);
 		if (NULL == _tmp)
-			return (false);
+			return (ERR_INTERNAL_MEMORY);
 		ctx->buffers = _tmp;
 		ctx->capacity += BUFFER_ALLOC;
 		for (_i = _old_cap; _i < ctx->capacity; _i++)
 			ctx->buffers[_i] = NULL;
 	}
-	return (true);
+	return (ERR_SUCCESS);
 }
 
-bool	cmd_buffer_create(t_Manager *manager, const t_Command *cmd)
+t_ErrorCode	cmd_buffer_create(t_Manager *manager, const t_Command *cmd)
 {
 	t_WritingCtx		*_ctx;
 	t_Buffer			*_buffer;
 	t_CmdCreateBuffer	*_payload;
 	size_t				_i;
 
-	if (NULL == manager || NULL == manager->writing_ctx || NULL == cmd)
-		return (false);
 	_ctx = manager->writing_ctx;
 	_payload = cmd->payload;
 	_i = 0;
@@ -63,183 +61,170 @@ bool	cmd_buffer_create(t_Manager *manager, const t_Command *cmd)
 		_i++;
 	_buffer = buffer_create();
 	if (NULL == _buffer)
-		return (false);
-	if (false == manage_capacity(_ctx, _i))
-		return (buffer_destroy(_buffer), false);
+		return (ERR_INTERNAL_MEMORY);
+	if (manage_capacity(_ctx, _i))
+		return (buffer_destroy(_buffer), ERR_INTERNAL_MEMORY);
 
 	_ctx->buffers[_i] = _buffer;
 	_payload->out_buffer_id = _i;
 	_ctx->count++;
-	return (true);
+	return (ERR_SUCCESS);
 }
 
-bool	cmd_buffer_destroy(t_Manager *manager, const t_Command *cmd)
+t_ErrorCode	cmd_buffer_destroy(t_Manager *manager, const t_Command *cmd)
 {
 	t_WritingCtx		*_ctx;
 	t_CmdDestroyBuffer	*_payload;
 
-	if (NULL == manager || NULL == manager->writing_ctx || NULL == cmd)
-		return (false);
 	_ctx = manager->writing_ctx;
 	_payload = cmd->payload;
 	if (_payload->buffer_id >= _ctx->capacity)
-		return (false);
+		return (ERR_BUFFER_NOT_FOUND);
 	if (NULL == _ctx->buffers[_payload->buffer_id])
-		return (false);
+		return (ERR_BUFFER_NOT_FOUND);
 	buffer_destroy(_ctx->buffers[_payload->buffer_id]);
 	_ctx->buffers[_payload->buffer_id] = NULL;
 	_ctx->count--;
-	return (true);
+	return (ERR_SUCCESS);
 }
 
 // +===----- Lines -----===+ //
 
-bool	cmd_buffer_line_insert(t_Manager *manager, const t_Command *cmd)
+t_ErrorCode	cmd_buffer_line_insert(t_Manager *manager, const t_Command *cmd)
 {
 	t_WritingCtx		*_ctx;
 	t_CmdInsertLine		*_payload;
 	t_Line				*_line;
 
-	if (NULL == manager || NULL == manager->writing_ctx || NULL == cmd)
-		return (false);
 	_ctx = manager->writing_ctx;
 	_payload = cmd->payload;
+	if (NULL == _ctx->buffers[_payload->buffer_id])
+		return (ERR_BUFFER_NOT_FOUND);
+	if (_payload->line == -1)
+		_payload->line = _ctx->buffers[_payload->buffer_id]->size - 1;
+	if((size_t)_payload->line > _ctx->buffers[_payload->buffer_id]->size)
+		return (ERR_LINE_NOT_FOUND);
 	_line = line_create();
 	if (NULL == _line)
-		return (false);
-	if (NULL == _ctx->buffers[_payload->buffer_id]
-		|| (ssize_t)_payload->line > _ctx->buffers[_payload->buffer_id]->size)
-		return (free(_line), false);
+		return (ERR_INTERNAL_MEMORY);
 	if (false == buffer_line_insert(
 		_ctx->buffers[_payload->buffer_id],
 		_line,
 		_payload->line
 	))
-		return (free(_line), false);
-	return (true);
+		return (free(_line), ERR_OPERATION_FAILED);
+	return (ERR_SUCCESS);
 }
 
-bool	cmd_buffer_line_delete(t_Manager *manager, const t_Command *cmd)
+t_ErrorCode	cmd_buffer_line_delete(t_Manager *manager, const t_Command *cmd)
 {
 	t_WritingCtx		*_ctx;
-	t_CmdDeleteLine	*_payload;
+	t_CmdDeleteLine		*_payload;
 	t_Line				*_line;
 
-	if (NULL == manager || NULL == manager->writing_ctx || NULL == cmd)
-		return (false);
 	_ctx = manager->writing_ctx;
 	_payload = cmd->payload;
 	if (NULL == _ctx->buffers[_payload->buffer_id])
-		return (false);
+		return (ERR_BUFFER_NOT_FOUND);
 	_line = buffer_get_line(_ctx->buffers[_payload->buffer_id], _payload->line);
 	if (NULL == _line)
-		return (false);
+		return (ERR_LINE_NOT_FOUND);
 	buffer_line_destroy(_ctx->buffers[_payload->buffer_id], _line);
-	return (true);
+	return (ERR_SUCCESS);
 }
 
-bool	cmd_buffer_line_split(t_Manager *manager, const t_Command *cmd)
+t_ErrorCode	cmd_buffer_line_split(t_Manager *manager, const t_Command *cmd)
 {
 	t_WritingCtx		*_ctx;
 	t_CmdSplitLine		*_payload;
 	t_Line				*_line;
 
-	if (NULL == manager || NULL == manager->writing_ctx || NULL == cmd)
-		return (false);
 	_ctx = manager->writing_ctx;
 	_payload = cmd->payload;
 	if (NULL == _ctx->buffers[_payload->buffer_id])
-		return (false);
+		return (ERR_BUFFER_NOT_FOUND);
 	_line = buffer_get_line(_ctx->buffers[_payload->buffer_id], _payload->line);
 	if (NULL == _line)
-		return (false);
+		return (ERR_LINE_NOT_FOUND);
 	if (NULL == buffer_line_split(_ctx->buffers[_payload->buffer_id], _line, _payload->index))
-		return (false);
-	return (true);
+		return (ERR_OPERATION_FAILED);
+	return (ERR_SUCCESS);
 }
 
-bool	cmd_buffer_line_join(t_Manager *manager, const t_Command *cmd)
+t_ErrorCode	cmd_buffer_line_join(t_Manager *manager, const t_Command *cmd)
 {
 	t_WritingCtx		*_ctx;
 	t_CmdJoinLine		*_payload;
 	t_Line				*_dst;
 	t_Line				*_src;
 
-	if (NULL == manager || NULL == manager->writing_ctx || NULL == cmd)
-		return (false);
 	_ctx = manager->writing_ctx;
 	_payload = cmd->payload;
 	if (NULL == _ctx->buffers[_payload->buffer_id])
-		return (false);
+		return (ERR_BUFFER_NOT_FOUND);
 	_dst = buffer_get_line(_ctx->buffers[_payload->buffer_id], _payload->dst);
 	_src = buffer_get_line(_ctx->buffers[_payload->buffer_id], _payload->src);
 	if (_src == _dst || _src->prev != _dst)
-		return (false);
+		return (ERR_INVALID_PAYLOAD);
 	if (NULL == _dst || NULL == _src)
-		return (false);
+		return (ERR_LINE_NOT_FOUND);
 	if (NULL == buffer_line_join(_ctx->buffers[_payload->buffer_id], _dst, _src))
-		return (false);
-	return (true);
+		return (ERR_OPERATION_FAILED);
+	return (ERR_SUCCESS);
 }
 
-bool	cmd_buffer_get_line(t_Manager *manager, const t_Command *cmd)
+t_ErrorCode	cmd_buffer_get_line(t_Manager *manager, const t_Command *cmd)
 {
 	t_WritingCtx		*_ctx;
 	t_CmdGetLine		*_payload;
 	t_Line				*_line;
 
-	if (NULL == manager || NULL == manager->writing_ctx || NULL == cmd)
-		return (false);
 	_ctx = manager->writing_ctx;
 	_payload = cmd->payload;
 	if (NULL == _ctx->buffers[_payload->buffer_id])
-		return (false);
+		return (ERR_BUFFER_NOT_FOUND);
 	_line = buffer_get_line(_ctx->buffers[_payload->buffer_id], _payload->line);
 	if (NULL == _line)
-		return (false);
+		return (ERR_LINE_NOT_FOUND);
 	_payload->out_data = _line->data;
 	_payload->out_len = _line->len;
-	return (true);
+	return (ERR_SUCCESS);
 }
 
 // +===----- Data -----===+ //
 
-bool	cmd_line_insert_data(t_Manager *manager, const t_Command *cmd)
+t_ErrorCode	cmd_line_insert_data(t_Manager *manager, const t_Command *cmd)
 {
 	t_WritingCtx		*_ctx;
 	t_CmdInsertData		*_payload;
 	t_Line				*_line;
 
-	if (NULL == manager || NULL == manager->writing_ctx || NULL == cmd)
-		return (false);
 	_ctx = manager->writing_ctx;
 	_payload = cmd->payload;
 	if (NULL == _ctx->buffers[_payload->buffer_id])
-		return (false);
+		return (ERR_BUFFER_NOT_FOUND);
 	_line = buffer_get_line(_ctx->buffers[_payload->buffer_id], _payload->line);
 	if (NULL == _line)
-		return (false);
+		return (ERR_LINE_NOT_FOUND);
 	if (false == line_insert_data(_line, _payload->column, _payload->size, _payload->data))
-		return (false);
-	return (true);
+		return (ERR_OPERATION_FAILED);
+	return (ERR_SUCCESS);
 }
 
-bool	cmd_line_delete_data(t_Manager *manager, const t_Command *cmd)
+t_ErrorCode	cmd_line_delete_data(t_Manager *manager, const t_Command *cmd)
 {
 	t_WritingCtx		*_ctx;
 	t_CmdDeleteData		*_payload;
 	t_Line				*_line;
 
-	if (NULL == manager || NULL == manager->writing_ctx || NULL == cmd)
-		return (false);
 	_ctx = manager->writing_ctx;
 	_payload = cmd->payload;
 	if (NULL == _ctx->buffers[_payload->buffer_id])
-		return (false);
+		return (ERR_BUFFER_NOT_FOUND);
 	_line = buffer_get_line(_ctx->buffers[_payload->buffer_id], _payload->line);
 	if (NULL == _line)
-		return (false);
+		return (ERR_LINE_NOT_FOUND);
 	if (false == line_delete_data(_line, _payload->column, _payload->size))
-		return (false);
-	return (true);
+		return (ERR_OPERATION_FAILED);
+	return (ERR_SUCCESS);
 }

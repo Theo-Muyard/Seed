@@ -18,7 +18,7 @@ typedef struct	s_Line
 typedef struct	s_Buffer
 {
 	t_Line	*line;
-	ssize_t	size;
+	size_t	size;
 }	t_Buffer;
 
 // +===----- Buffer -----===+ //
@@ -103,6 +103,6 @@ bool		line_insert_data(t_Line *line, ssize_t column, size_t size, const char *da
  * @param size The size of the data.
  * @return TRUE for success or FALSE if an error occured.
 */
-bool		line_delete_data(t_Line *line, ssize_t column, size_t size);
+bool		line_delete_data(t_Line *line, size_t column, size_t size);
 
 #endif

@@ -9,7 +9,7 @@
 
 typedef struct s_Command	t_Command;
 
-typedef bool	(*t_Fn)(t_Manager *manager, const t_Command *cmd);
+typedef t_ErrorCode	(*t_Fn)(t_Manager *manager, const t_Command *cmd);
 
 typedef struct	s_CommandEntry
 {
@@ -53,8 +53,8 @@ bool	dispatcher_register(t_Dispatcher *dispatcher, t_CommandId id, t_Fn fn);
  * @brief Execute the function of the specified command.
  * @param manager The manager that will contains contexts.
  * @param cmd The content of the command.
- * @return TRUE for success or FALSE if an error occured.
+ * @return An error code or SUCCESS (=0).
 */
-bool	dispatcher_exec(t_Manager *manager, const t_Command *cmd);
+t_ErrorCode	dispatcher_exec(t_Manager *manager, const t_Command *cmd);
 
 #endif

@@ -24,8 +24,8 @@
 
 **Impact:** Homogénéité, lisibilité, cohérence globale
 
-- 🟨 **Audit complet des noms publics**
-  - [ ] Analyser tous les symboles exposés dans `seed.h`
+- ✅ **Audit complet des noms publics**
+  - [x] Analyser tous les symboles exposés dans `seed.h`
   - [x] Ajouter / vérifier les conventions de nommage (snake_case, préfixes)
   - [x] Documenter / modifier les incohérences trouvées
   - [x] Créer une table de migration
@@ -35,11 +35,11 @@
   - [x] Ajouter / verifier la norme des systemes (internal,  commandes, system)
   - [x] S'assurer que les structures ont le préfixe `t_`, les enums `e_`, les structure `s_`
 
-- ⬜ **Homogénéiser les conventions de paramètres**
-  - [ ] Les erreurs / status toujours en dernier paramètre?
-  - [ ] Les handles toujours en premier?
-  - [ ] Les outputs toujours pointeurs?
-  - [ ] Documenter la convention finale
+- ✅ **Homogénéiser les conventions de paramètres**
+  - [x] Les erreurs / status toujours en dernier paramètre?
+  - [x] Les handles toujours en premier?
+  - [x] Les outputs toujours pointeurs?
+  - [x] Documenter la convention finale
 
 - ✅ **Renommer et migrer progressivement**
   - [x] Lister les changements de noms (old → new)
@@ -53,22 +53,22 @@
 
 **Impact:** Debuggage facile, traçabilité, contrôle d'erreur
 
-- ⬜ **Concevoir la structure d'erreur**
-  - [ ] Créer un enum `t_ErrorCode` avec tous les codes d'erreurs possibles
-  - [ ] Ajouter des codes pour chaque système (Manager, Dispatcher, Writing, FileSystem, etc...)
-  - [ ] Ajouter des codes pour les erreurs communes (allocation, validation, etc)
-  - [ ] Exemple : `ERR_BUFFER_NOT_FOUND`, `ERR_INVALID_PAYLOAD`, etc
+- ✅ **Concevoir la structure d'erreur**
+  - [x] Créer un enum `t_ErrorCode` avec tous les codes d'erreurs possibles
+  - [x] Ajouter des codes pour chaque système (Manager, Dispatcher, Writing, FileSystem, etc...)
+  - [x] Ajouter des codes pour les erreurs communes (allocation, validation, etc)
+  - [x] Exemple : `ERR_BUFFER_NOT_FOUND`, `ERR_INVALID_PAYLOAD`, etc
 
 - ⬜ **Créer la structure de retour**
   - [ ] Définir `t_Result` ou `t_Status` (avec code + message optionnel)
   - [ ] Ou créer des fonctions qui remplissent une `t_Error` en output
   - [ ] Décider: retour booléen → retour structuré ou output param?
 
-- ⬜ **Mettre à jour toutes les fonctions**
-  - [ ] Manager : `manager_exec()`, `manager_init()`, etc
-  - [ ] Dispatcher : toutes les fonctions
-  - [ ] Writing system : toutes les fonctions
-  - [ ] Tests : vérifier les codes d'erreur
+- ✅ **Mettre à jour toutes les fonctions**
+  - [x] Manager : `manager_exec()`, `manager_init()`, etc
+  - [x] Dispatcher : toutes les fonctions
+  - [x] Writing system : toutes les fonctions
+  - [x] Tests : vérifier les codes d'erreur
 
 ---
 
@@ -179,8 +179,6 @@
   - [ ] Lancer les linters
   - [ ] Fixer les warnings
   - [ ] Revoir les conventions de code
-
----
 
 ---
 

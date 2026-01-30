@@ -30,9 +30,11 @@ void		manager_clean(t_Manager *manager)
 	free(manager);
 }
 
-bool		manager_exec(t_Manager *manager, t_Command *cmd)
+t_ErrorCode	manager_exec(t_Manager *manager, t_Command *cmd)
 {
-	if (NULL == manager || NULL == manager->dispatcher || NULL == cmd)
-		return (false);
+	if (NULL == manager)
+		return (ERR_INVALID_MANAGER);
+	if (NULL == cmd)
+		return (ERR_INVALID_COMMAND);
 	return (dispatcher_exec(manager, cmd));
 }

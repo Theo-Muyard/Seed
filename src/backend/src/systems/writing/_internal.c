@@ -82,7 +82,7 @@ bool		buffer_line_insert(t_Buffer *buffer, t_Line *line, ssize_t index)
 	
 	if (index < 0)
 		index = buffer->size;
-	if (index > buffer->size)
+	if ((size_t)index > buffer->size)
 		return (false);
 
 	if (index == 0)
@@ -157,11 +157,13 @@ t_Line		*buffer_get_line(t_Buffer *buffer, ssize_t index)
 	t_Line	*_tmp;
 	ssize_t	_i;
 
-	if (NULL == buffer || index >= buffer->size)
+	if (NULL == buffer)
 		return (NULL);
-	
+
 	if (index < 0)
 		index = buffer->size - 1;
+	if ((size_t)index >= buffer->size)
+		return (NULL);
 
 	_tmp = buffer->line;
 	_i = 0;
@@ -211,13 +213,11 @@ bool		line_insert_data(t_Line *line, ssize_t column, size_t size, const char *da
 	return (true);
 }
 
-bool		line_delete_data(t_Line *line, ssize_t column, size_t size)
+bool		line_delete_data(t_Line *line, size_t column, size_t size)
 {
 	if (NULL == line)
 		return (false);
-	if (column < 0)
-		column = line->len;
-	if ((size_t)column > line->len)
+	if (column > line->len)
 		return (false);
 	if (column + size > line->len)
     	size = line->len - column;

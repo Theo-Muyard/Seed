@@ -433,6 +433,7 @@ static int	test_buffer_get_line(void)
 
 	// Test 1: Get line at index 0
 	_retrieved = buffer_get_line(_buffer, 0);
+	printf("data: %s\n", _retrieved->data);
 	if (NULL == _retrieved || 0 != strcmp(_retrieved->data, "1"))
 		return (buffer_destroy(_buffer), print_error("Failed to get line at index 0"), 1);
 	print_success("Retrieved line at index 0: '1'");

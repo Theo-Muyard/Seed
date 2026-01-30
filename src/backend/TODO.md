@@ -26,14 +26,14 @@
 
 - 🟨 **Audit complet des noms publics**
   - [ ] Analyser tous les symboles exposés dans `seed.h`
-  - [ ] Ajouter / vérifier les conventions de nommage (snake_case, préfixes)
-  - [ ] Documenter / modifier les incohérences trouvées
-  - [ ] Créer une table de migration
+  - [x] Ajouter / vérifier les conventions de nommage (snake_case, préfixes)
+  - [x] Documenter / modifier les incohérences trouvées
+  - [x] Créer une table de migration
 
-- ⬜ **Normaliser le code**
-  - [ ] Prefixer les fonctions / emums de leur contexte (`manager_*`, `dispatcher_*`, etc...)
-  - [ ] Ajouter / verifier la norme des systemes (internal,  commandes, system)
-  - [ ] S'assurer que les structures ont le préfixe `t_`, les enums `e_`, les structure `s_`
+- ✅ **Normaliser le code**
+  - [x] Prefixer les fonctions / emums de leur contexte (`manager_*`, `dispatcher_*`, etc...)
+  - [x] Ajouter / verifier la norme des systemes (internal,  commandes, system)
+  - [x] S'assurer que les structures ont le préfixe `t_`, les enums `e_`, les structure `s_`
 
 - ⬜ **Homogénéiser les conventions de paramètres**
   - [ ] Les erreurs / status toujours en dernier paramètre?
@@ -41,11 +41,11 @@
   - [ ] Les outputs toujours pointeurs?
   - [ ] Documenter la convention finale
 
-- ⬜ **Renommer et migrer progressivement**
-  - [ ] Lister les changements de noms (old → new)
-  - [ ] Migrer les tests
-  - [ ] Migrer les examples/docs
-  - [ ] Retirer les anciens noms
+- ✅ **Renommer et migrer progressivement**
+  - [x] Lister les changements de noms (old → new)
+  - [x] Migrer les tests
+  - [x] Migrer les examples/docs
+  - [x] Retirer les anciens noms
 
 ---
 

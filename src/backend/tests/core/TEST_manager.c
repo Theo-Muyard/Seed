@@ -81,8 +81,7 @@ static int	test_manager_buffers(void)
 	_payload.out_buffer_id = 0;
 	_cmd.id = CMD_WRITING_CREATE_BUFFER;
 	_cmd.payload = &_payload;
-	_cmd.payload_size = sizeof(t_CmdCreateBuffer);
-
+	
 	if (false == manager_exec(_manager, &_cmd))
 		return (print_error("Failed to execute create buffer command"), 1);
 	print_success("Buffer creation command executed");
@@ -114,7 +113,7 @@ static int	test_manager_lines_and_text(void)
 	t_Command			_cmd;
 	t_CmdCreateBuffer	_create_payload;
 	t_CmdInsertLine		_insert_line_payload;
-	t_CmdAddData		_add_data_payload;
+	t_CmdInsertData		_add_data_payload;
 	t_CmdDeleteData		_delete_data_payload;
 	size_t				_buffer_id;
 	char				_text[] = "Hello World";
@@ -129,8 +128,7 @@ static int	test_manager_lines_and_text(void)
 	_create_payload.out_buffer_id = 0;
 	_cmd.id = CMD_WRITING_CREATE_BUFFER;
 	_cmd.payload = &_create_payload;
-	_cmd.payload_size = sizeof(t_CmdCreateBuffer);
-
+	
 	if (false == manager_exec(_manager, &_cmd))
 		return (print_error("Failed to create buffer"), 1);
 
@@ -140,8 +138,6 @@ static int	test_manager_lines_and_text(void)
 	_insert_line_payload.line = 0;
 	_cmd.id = CMD_WRITING_INSERT_LINE;
 	_cmd.payload = &_insert_line_payload;
-	_cmd.payload_size = sizeof(t_CmdInsertLine);
-
 	if (false == manager_exec(_manager, &_cmd))
 		return (print_error("Failed to insert line"), 1);
 	print_success("Line created in buffer");
@@ -154,8 +150,6 @@ static int	test_manager_lines_and_text(void)
 
 	_cmd.id = CMD_WRITING_INSERT_TEXT;
 	_cmd.payload = &_add_data_payload;
-	_cmd.payload_size = sizeof(t_CmdAddData);
-
 	if (false == manager_exec(_manager, &_cmd))
 		return (print_error("Failed to insert text"), 1);
 	print_success("Text inserted: 'Hello World'");
@@ -169,8 +163,6 @@ static int	test_manager_lines_and_text(void)
 
 	_cmd.id = CMD_WRITING_DELETE_TEXT;
 	_cmd.payload = &_delete_data_payload;
-	_cmd.payload_size = sizeof(t_CmdDeleteData);
-
 	if (false == manager_exec(_manager, &_cmd))
 		return (print_error("Failed to delete text"), 1);
 	print_success("Text deleted");
@@ -187,7 +179,7 @@ static int	test_manager_split_join(void)
 	t_Command			_cmd;
 	t_CmdCreateBuffer	_create_payload;
 	t_CmdInsertLine		_insert_line_payload;
-	t_CmdAddData		_add_data_payload;
+	t_CmdInsertData		_add_data_payload;
 	t_CmdSplitLine		_split_payload;
 	t_CmdJoinLine		_join_payload;
 	size_t				_buffer_id;
@@ -202,8 +194,7 @@ static int	test_manager_split_join(void)
 	_create_payload.out_buffer_id = 0;
 	_cmd.id = CMD_WRITING_CREATE_BUFFER;
 	_cmd.payload = &_create_payload;
-	_cmd.payload_size = sizeof(t_CmdCreateBuffer);
-	manager_exec(_manager, &_cmd);
+		manager_exec(_manager, &_cmd);
 
 	_buffer_id = _create_payload.out_buffer_id;
 
@@ -211,7 +202,6 @@ static int	test_manager_split_join(void)
 	_insert_line_payload.line = 0;
 	_cmd.id = CMD_WRITING_INSERT_LINE;
 	_cmd.payload = &_insert_line_payload;
-	_cmd.payload_size = sizeof(t_CmdInsertLine);
 	manager_exec(_manager, &_cmd);
 	manager_exec(_manager, &_cmd);
 
@@ -223,7 +213,6 @@ static int	test_manager_split_join(void)
 
 	_cmd.id = CMD_WRITING_INSERT_TEXT;
 	_cmd.payload = &_add_data_payload;
-	_cmd.payload_size = sizeof(t_CmdAddData);
 	manager_exec(_manager, &_cmd);
 
 	_add_data_payload.line = 1;
@@ -242,8 +231,6 @@ static int	test_manager_split_join(void)
 
 	_cmd.id = CMD_WRITING_SPLIT_LINE;
 	_cmd.payload = &_split_payload;
-	_cmd.payload_size = sizeof(t_CmdSplitLine);
-
 	if (false == manager_exec(_manager, &_cmd))
 		return (print_error("Failed to split line"), 1);
 	print_success("Line split at index 4");
@@ -256,8 +243,6 @@ static int	test_manager_split_join(void)
 
 	_cmd.id = CMD_WRITING_JOIN_LINE;
 	_cmd.payload = &_join_payload;
-	_cmd.payload_size = sizeof(t_CmdJoinLine);
-
 	if (false == manager_exec(_manager, &_cmd))
 		return (print_error("Failed to join lines"), 1);
 	print_success("Lines joined successfully");

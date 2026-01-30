@@ -144,7 +144,6 @@ static int	test_dispatcher_exec(void)
 
 	_cmd.id = CMD_WRITING_CREATE_BUFFER;
 	_cmd.payload = NULL;
-	_cmd.payload_size = 0;
 
 	if (false == dispatcher_exec(_manager, &_cmd))
 		return (print_error("Failed to execute registered command"), 1);

@@ -1,4 +1,4 @@
-# Seed Core v0.1 - API Documentation
+# Seed Core v0.2 - API Documentation
 
 > A high-performance backend system for text editing operations, providing a command-based interface for buffer and line manipulation.
 
@@ -31,8 +31,7 @@ int main(void)
     // Execute a command
     t_Command cmd = {
         .id = CMD_WRITING_CREATE_BUFFER,
-        .payload = NULL,
-        .payload_size = 0
+        .payload = NULL
     };
     
     if (!manager_exec(manager, &cmd))
@@ -47,7 +46,7 @@ int main(void)
 ### Compilation
 
 ```bash
-gcc main.c -o main -L. -lseed_core -I./includes
+gcc main.c -o main seed_core.a -I./includes
 ```
 
 ---
@@ -152,8 +151,7 @@ Executes a command on the manager.
 t_CmdCreateBuffer payload = {0};
 t_Command cmd = {
     .id = CMD_WRITING_CREATE_BUFFER,
-    .payload = &payload,
-    .payload_size = sizeof(t_CmdCreateBuffer)
+    .payload = &payload
 };
 
 if (!manager_exec(manager, &cmd)) {
@@ -174,16 +172,14 @@ size_t buffer_id = payload.out_buffer_id;
 ```c
 typedef struct s_Command
 {
-    t_CommandId id;              // Which command to execute
-    void *payload;               // Command-specific data (can be NULL)
-    size_t payload_size;         // Size of the payload
-} t_Command;
+    t_CommandId	id;				// Which command to execute
+    void		*payload;		// Command-specific data (can be NULL)
+}	t_Command;
 ```
 
 ### Payload Rules
 
 1. **Payload can be NULL** - For commands that don't need parameters
-2. **Size must match** - The payload_size should exactly match the struct size
 3. **Input vs Output fields** - Some fields are written to, some are read from
 4. **Lifetime** - The payload must remain valid during `manager_exec()` execution
 
@@ -204,8 +200,8 @@ Creates a new empty buffer.
 **Payload:** `t_CmdCreateBuffer`
 ```c
 typedef struct {
-    size_t out_buffer_id;  // OUTPUT: The ID of the created buffer
-} t_CmdCreateBuffer;
+    size_t	out_buffer_id;	// OUTPUT: The ID of the created buffer
+}	t_CmdCreateBuffer;
 ```
 
 **Usage:**
@@ -213,8 +209,7 @@ typedef struct {
 t_CmdCreateBuffer payload = {0};
 t_Command cmd = {
     .id = CMD_WRITING_CREATE_BUFFER,
-    .payload = &payload,
-    .payload_size = sizeof(t_CmdCreateBuffer)
+    .payload = &payload
 };
 
 manager_exec(manager, &cmd);
@@ -230,8 +225,8 @@ Destroys a buffer and all its contents.
 **Payload:** `t_CmdDestroyBuffer`
 ```c
 typedef struct {
-    size_t buffer_id;  // INPUT: The buffer to destroy
-} t_CmdDestroyBuffer;
+    size_t	buffer_id;	// INPUT: The buffer to destroy
+}	t_CmdDestroyBuffer;
 ```
 
 **Important:** After this command, all lines in the buffer are freed. Don't reference them afterwards.
@@ -243,8 +238,7 @@ t_CmdDestroyBuffer payload = {
 };
 t_Command cmd = {
     .id = CMD_WRITING_DELETE_BUFFER,
-    .payload = &payload,
-    .payload_size = sizeof(t_CmdDestroyBuffer)
+    .payload = &payload
 };
 
 manager_exec(manager, &cmd);
@@ -261,9 +255,9 @@ Inserts a new empty line at the specified position.
 **Payload:** `t_CmdInsertLine`
 ```c
 typedef struct {
-    size_t buffer_id;  // INPUT: Target buffer
-    size_t line;       // INPUT: Position to insert (0-based)
-} t_CmdInsertLine;
+    size_t	buffer_id;	// INPUT: Target buffer
+    size_t	line;		// INPUT: Position to insert (0-based)
+}	t_CmdInsertLine;
 ```
 
 **Line Numbering:**
@@ -276,12 +270,11 @@ typedef struct {
 ```c
 t_CmdInsertLine payload = {
     .buffer_id = buffer_id,
-    .line = 0  // Insert at the beginning
+    .line = 0	// Insert at the beginning
 };
 t_Command cmd = {
     .id = CMD_WRITING_INSERT_LINE,
-    .payload = &payload,
-    .payload_size = sizeof(t_CmdInsertLine)
+    .payload = &payload
 };
 
 manager_exec(manager, &cmd);
@@ -293,24 +286,23 @@ manager_exec(manager, &cmd);
 
 Deletes a line at the specified position.
 
-**Payload:** `t_CmdDestroyLine`
+**Payload:** `t_CmdDeleteLine`
 ```c
 typedef struct {
-    size_t buffer_id;  // INPUT: Target buffer
-    size_t line;       // INPUT: Line to delete (0-based)
-} t_CmdDestroyLine;
+    size_t	buffer_id;	// INPUT: Target buffer
+    size_t	line;		// INPUT: Line to delete (0-based)
+}	t_CmdDeleteLine;
 ```
 
 **Usage:**
 ```c
-t_CmdDestroyLine payload = {
+t_CmdDeleteLine payload = {
     .buffer_id = buffer_id,
     .line = 0,
 };
 t_Command cmd = {
     .id = CMD_WRITING_DELETE_LINE,
-    .payload = &payload,
-    .payload_size = sizeof(t_CmdDestroyLine)
+    .payload = &payload
 };
 
 manager_exec(manager, &cmd);
@@ -325,10 +317,10 @@ Splits a line into two at the specified index.
 **Payload:** `t_CmdSplitLine`
 ```c
 typedef struct {
-    size_t buffer_id;  // INPUT: Target buffer
-    size_t line;       // INPUT: Line to split (0-based)
-    size_t index;      // INPUT: Character index where to split
-} t_CmdSplitLine;
+    size_t	buffer_id;	// INPUT: Target buffer
+    size_t	line;		// INPUT: Line to split (0-based)
+    size_t	index;		// INPUT: Character index where to split
+}	t_CmdSplitLine;
 ```
 
 **Behavior:**
@@ -353,10 +345,10 @@ Joins two consecutive lines into one.
 **Payload:** `t_CmdJoinLine`
 ```c
 typedef struct {
-    size_t buffer_id;  // INPUT: Target buffer
-    size_t dst;        // INPUT: Destination line (0-based)
-    size_t src;        // INPUT: Source line (must be dst + 1)
-} t_CmdJoinLine;
+    size_t	buffer_id;  // INPUT: Target buffer
+    size_t	dst;        // INPUT: Destination line (0-based)
+    size_t	src;        // INPUT: Source line (must be dst + 1)
+}	t_CmdJoinLine;
 ```
 
 **Requirements:**
@@ -380,11 +372,11 @@ Retrieves the content of a line.
 **Payload:** `t_CmdGetLine`
 ```c
 typedef struct {
-    size_t buffer_id;      // INPUT: Target buffer
-    size_t line;           // INPUT: Line to retrieve (0-based)
-    const char *out_data;  // OUTPUT: Pointer to line data
-    size_t out_len;        // OUTPUT: Length of the data
-} t_CmdGetLine;
+    size_t		buffer_id;	// INPUT: Target buffer
+    size_t		line;		// INPUT: Line to retrieve (0-based)
+    const char	*out_data;	// OUTPUT: Pointer to line data
+    size_t		out_len;	// OUTPUT: Length of the data
+}	t_CmdGetLine;
 ```
 
 **Important:**
@@ -400,18 +392,16 @@ t_CmdGetLine payload = {
 };
 t_Command cmd = {
     .id = CMD_WRITING_GET_LINE,
-    .payload = &payload,
-    .payload_size = sizeof(t_CmdGetLine)
+    .payload = &payload
 };
 
 manager_exec(manager, &cmd);
 
 // Use the data immediately
-printf("Line content: %.*s\n", (int)payload.out_len, payload.out_data);
+printf("Line content: %s\n", (int)payload.out_len, payload.out_data);
 // or copy it if you need it later
 char *copy = malloc(payload.out_len + 1);
 memcpy(copy, payload.out_data, payload.out_len);
-copy[payload.out_len] = '\0';
 ```
 
 ---
@@ -422,15 +412,15 @@ copy[payload.out_len] = '\0';
 
 Inserts text into a line at the specified column.
 
-**Payload:** `t_CmdAddData`
+**Payload:** `t_CmdInsertData`
 ```c
 typedef struct {
-    size_t buffer_id;  // INPUT: Target buffer
-    size_t line;       // INPUT: Target line (0-based)
-    size_t column;     // INPUT: Column to insert at (0-based)
-    size_t size;       // INPUT: Number of bytes to insert
-    char *data;        // INPUT: Pointer to the data to insert
-} t_CmdAddData;
+    size_t	buffer_id;	// INPUT: Target buffer
+    size_t	line;		// INPUT: Target line (0-based)
+    size_t	column;		// INPUT: Column to insert at (0-based)
+    size_t	size;		// INPUT: Number of bytes to insert
+    char	*data;		// INPUT: Pointer to the data to insert
+}	t_CmdInsertData;
 ```
 
 **Column Indexing:**
@@ -444,7 +434,7 @@ typedef struct {
 **Usage:**
 ```c
 const char *text = "Hello";
-t_CmdAddData payload = {
+t_CmdInsertData payload = {
     .buffer_id = buffer_id,
     .line = 0,
     .column = 0,
@@ -453,8 +443,7 @@ t_CmdAddData payload = {
 };
 t_Command cmd = {
     .id = CMD_WRITING_INSERT_TEXT,
-    .payload = &payload,
-    .payload_size = sizeof(t_CmdAddData)
+    .payload = &payload
 };
 
 manager_exec(manager, &cmd);
@@ -469,11 +458,11 @@ Deletes text from a line at the specified column.
 **Payload:** `t_CmdDeleteData`
 ```c
 typedef struct {
-    size_t buffer_id;  // INPUT: Target buffer
-    size_t line;       // INPUT: Target line (0-based)
-    size_t column;     // INPUT: Starting column (0-based)
-    size_t size;       // INPUT: Number of bytes to delete
-} t_CmdDeleteData;
+    size_t	buffer_id;	// INPUT: Target buffer
+    size_t	line;		// INPUT: Target line (0-based)
+    size_t	column;		// INPUT: Starting column (0-based)
+    size_t	size;		// INPUT: Number of bytes to delete
+}	t_CmdDeleteData;
 ```
 
 **Behavior:**
@@ -490,8 +479,7 @@ t_CmdDeleteData payload = {
 };
 t_Command cmd = {
     .id = CMD_WRITING_DELETE_TEXT,
-    .payload = &payload,
-    .payload_size = sizeof(t_CmdDeleteData)
+    .payload = &payload
 };
 
 manager_exec(manager, &cmd);
@@ -517,8 +505,7 @@ int main(void)
     t_CmdCreateBuffer create_payload = {0};
     t_Command create_cmd = {
         .id = CMD_WRITING_CREATE_BUFFER,
-        .payload = &create_payload,
-        .payload_size = sizeof(t_CmdCreateBuffer)
+        .payload = &create_payload
     };
     manager_exec(manager, &create_cmd);
     size_t buffer_id = create_payload.out_buffer_id;
@@ -530,14 +517,13 @@ int main(void)
     };
     t_Command insert_cmd = {
         .id = CMD_WRITING_INSERT_LINE,
-        .payload = &insert_payload,
-        .payload_size = sizeof(t_CmdInsertLine)
+        .payload = &insert_payload
     };
     manager_exec(manager, &insert_cmd);
     
     // Add text to the line
     const char *text = "Hello, Seed!";
-    t_CmdAddData add_payload = {
+    t_CmdInsertData add_payload = {
         .buffer_id = buffer_id,
         .line = 0,
         .column = 0,
@@ -546,8 +532,7 @@ int main(void)
     };
     t_Command add_cmd = {
         .id = CMD_WRITING_INSERT_TEXT,
-        .payload = &add_payload,
-        .payload_size = sizeof(t_CmdAddData)
+        .payload = &add_payload
     };
     manager_exec(manager, &add_cmd);
     
@@ -558,12 +543,11 @@ int main(void)
     };
     t_Command get_cmd = {
         .id = CMD_WRITING_GET_LINE,
-        .payload = &get_payload,
-        .payload_size = sizeof(t_CmdGetLine)
+        .payload = &get_payload
     };
     manager_exec(manager, &get_cmd);
     
-    printf("Content: %.*s\n", (int)get_payload.out_len, get_payload.out_data);
+    printf("Content: %s\n", (int)get_payload.out_len, get_payload.out_data);
     
     manager_clean(manager);
     return (0);
@@ -585,8 +569,7 @@ t_CmdSplitLine split_payload = {
 };
 t_Command split_cmd = {
     .id = CMD_WRITING_SPLIT_LINE,
-    .payload = &split_payload,
-    .payload_size = sizeof(t_CmdSplitLine)
+    .payload = &split_payload
 };
 manager_exec(manager, &split_cmd);
 // Now: Line 0 = "Hello", Line 1 = "World"
@@ -599,8 +582,7 @@ t_CmdJoinLine join_payload = {
 };
 t_Command join_cmd = {
     .id = CMD_WRITING_JOIN_LINE,
-    .payload = &join_payload,
-    .payload_size = sizeof(t_CmdJoinLine)
+    .payload = &join_payload
 };
 manager_exec(manager, &join_cmd);
 // Now: Line 0 = "HelloWorld"
@@ -637,7 +619,6 @@ if (!manager_exec(manager, &cmd)) {
 2. **Always clean up** - Call `manager_clean()` before exit
 3. **Validate indices** - Check buffer and line IDs before use
 4. **Copy output data immediately** - Don't rely on pointer validity
-5. **Use exact sizes** - Match payload sizes exactly
 
 ---
 
@@ -650,9 +631,8 @@ if (!manager_exec(manager, &cmd)) {
 t_CmdGetLine payload = {.buffer_id = bid, .line = 0};
 manager_exec(manager, &cmd);
 // Use payload.out_data immediately or copy it
-char *copy = malloc(payload.out_len + 1);
+char *copy = malloc(payload.out_len);
 memcpy(copy, payload.out_data, payload.out_len);
-copy[payload.out_len] = '\0';
 
 // ❌ WRONG
 manager_exec(manager, &cmd);
@@ -693,11 +673,19 @@ size_t buffer_id = payload.out_buffer_id;
 
 ## Changelog
 
-### v0.1 (Current)
+### v0.1
 - Initial release
 - Writing system with buffer, line, and text operations
 - Command-based architecture
 - 9 core commands
+
+### v0.2 (current)
+- #### `Names changed`
+| Old | New |
+|-------|----------|
+| t_CmdAddData | t_CmdInsertData |
+| t_CmdDestroyLine | t_CmdDeleteLine |
+- Payload size is no longer used.
 
 ---
 
@@ -707,4 +695,4 @@ For issues or questions, refer to the source code documentation or test files in
 
 ---
 
-**Seed Core v0.1** | Built for high-performance text editing operations
+**Seed Core v0.2** | Built for high-performance text editing operations

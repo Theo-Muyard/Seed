@@ -11,6 +11,15 @@
 
 typedef struct s_Manager	t_Manager;
 
+// TODO: Ajouter code d'erreur globalement
+typedef enum	e_ErrorCode
+{
+	ERR_INTERNAL_MEMORY,
+	ERR_INVALID_MANAGER,
+	ERR_INVALID_PAYLOAD,
+}	t_ErrorCode;
+// END TODO
+
 typedef enum	e_CommandId
 {
 	CMD_WRITING_CREATE_BUFFER,
@@ -30,7 +39,6 @@ typedef struct s_Command
 {
 	t_CommandId		id;
 	void			*payload;
-	size_t			payload_size;
 }	t_Command;
 
 // +===----- Payload types -----===+ //
@@ -53,11 +61,11 @@ typedef struct	s_CmdInsertLine
 	size_t	line;
 }	t_CmdInsertLine;
 
-typedef struct	s_CmdDestroyLine
+typedef struct	s_CmdDeleteLine
 {
 	size_t	buffer_id;
 	size_t	line;
-}	t_CmdDestroyLine;
+}	t_CmdDeleteLine;
 
 typedef struct	s_CmdSplitLine
 {
@@ -81,14 +89,14 @@ typedef struct	s_CmdGetLine
 	size_t		out_len;
 }	t_CmdGetLine;
 
-typedef struct	s_CmdAddData
+typedef struct	s_CmdInsertData
 {
 	size_t	buffer_id;
 	size_t	line;
 	size_t	column;
 	size_t	size;
 	char	*data;
-}	t_CmdAddData;
+}	t_CmdInsertData;
 
 typedef struct	s_CmdDeleteData
 {

@@ -19,7 +19,7 @@ typedef struct s_WritingCtx
 
 // +===----- Commands -----===+ //
 
-#define WRITING_COMMANDS_COUNT 9
+# define WRITING_COMMANDS_COUNT 9
 
 extern const t_CommandEntry	writing_commands[];
 

@@ -9,23 +9,29 @@
 const t_CommandEntry	writing_commands[] = {
 	{ CMD_WRITING_CREATE_BUFFER,	cmd_buffer_create},
 	{ CMD_WRITING_DELETE_BUFFER,	cmd_buffer_destroy},
-
+	
 	{ CMD_WRITING_INSERT_LINE,		cmd_buffer_line_insert},
-	{ CMD_WRITING_DELETE_LINE,		cmd_buffer_line_destroy},
+	{ CMD_WRITING_DELETE_LINE,		cmd_buffer_line_delete},
 	{ CMD_WRITING_SPLIT_LINE,		cmd_buffer_line_split},
 	{ CMD_WRITING_JOIN_LINE,		cmd_buffer_line_join},
 	{ CMD_WRITING_GET_LINE,			cmd_buffer_get_line},
-
-	{ CMD_WRITING_INSERT_TEXT,		cmd_line_add_data},
+	
+	{ CMD_WRITING_INSERT_TEXT,		cmd_line_insert_data},
 	{ CMD_WRITING_DELETE_TEXT,		cmd_line_delete_data},
 };
 
-static bool	register_commands(t_Dispatcher *dispatcher, const t_CommandEntry *commands, size_t size)
+/**
+ * @brief Registers the commands into the dispatcher.
+ * @param dispatcher The dispatcher that will contains commands.
+ * @param commands The container for all write command entries.
+ * @param counr The count of commands.
+*/
+static bool	register_commands(t_Dispatcher *dispatcher, const t_CommandEntry *commands, size_t count)
 {
 	size_t	_i;
 
 	_i = 0;
-	while (_i < size)
+	while (_i < count)
 	{
 		if (false == dispatcher_register(dispatcher, commands[_i].id, commands[_i].fn))
 			return (false);

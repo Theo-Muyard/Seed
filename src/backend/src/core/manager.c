@@ -34,7 +34,5 @@ bool		manager_exec(t_Manager *manager, t_Command *cmd)
 {
 	if (NULL == manager || NULL == manager->dispatcher || NULL == cmd)
 		return (false);
-	if (false == dispatcher_exec(manager, cmd))
-		return (false);
-	return (true);
+	return (dispatcher_exec(manager, cmd));
 }

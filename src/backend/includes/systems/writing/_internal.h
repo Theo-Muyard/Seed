@@ -94,7 +94,7 @@ t_Line		*buffer_get_line(t_Buffer *buffer, ssize_t index);
  * @param data The data that will be added.
  * @return TRUE for success or FALSE if an error occured.
 */
-bool		line_add_data(t_Line *line, ssize_t column, size_t size, const char *data);
+bool		line_insert_data(t_Line *line, ssize_t column, size_t size, const char *data);
 
 /**
  * @brief Delete the data to the given line.

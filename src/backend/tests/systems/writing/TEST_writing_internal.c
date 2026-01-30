@@ -107,7 +107,7 @@ static int	test_buffer_create(void)
  *   - Length and capacity tracking
  *   - Null terminator
 */
-static int	test_line_add_data(void)
+static int	test_line_insert_data(void)
 {
 	t_Line	*_line;
 	char	_text[] = "Hello World";
@@ -120,7 +120,7 @@ static int	test_line_add_data(void)
 		return (print_error("Failed to create line"), 1);
 
 	// Test 1: Add data to empty line
-	if (false == line_add_data(_line, 0, strlen(_text), _text))
+	if (false == line_insert_data(_line, 0, strlen(_text), _text))
 		return (print_error("Failed to add data to line"), 1);
 	print_success("Data added to line");
 
@@ -143,7 +143,7 @@ static int	test_line_add_data(void)
 	// Test 2: Add more data at end
 	_original_len = _line->len;
 	char _more[] = "!";
-	if (false == line_add_data(_line, _line->len, strlen(_more), _more))
+	if (false == line_insert_data(_line, _line->len, strlen(_more), _more))
 		return (print_error("Failed to append data"), 1);
 	print_success("Data appended successfully");
 
@@ -156,7 +156,7 @@ static int	test_line_add_data(void)
 
 	// Test 3: Insert data in middle
 	char _middle[] = " Beautiful";
-	if (false == line_add_data(_line, 5, strlen(_middle), _middle))
+	if (false == line_insert_data(_line, 5, strlen(_middle), _middle))
 		return (print_error("Failed to insert in middle"), 1);
 	print_success("Data inserted in middle");
 
@@ -186,7 +186,7 @@ static int	test_line_delete_data(void)
 		return (print_error("Failed to create line"), 1);
 
 	// Setup: Add data
-	if (false == line_add_data(_line, 0, strlen(_text), _text))
+	if (false == line_insert_data(_line, 0, strlen(_text), _text))
 		return (print_error("Failed to add data"), 1);
 	print_success("Initial data: 'DELETE_THIS_PART'");
 
@@ -312,7 +312,7 @@ static int	test_buffer_line_split(void)
 	// Setup: Create line with data
 	_line = line_create();
 	buffer_line_insert(_buffer, _line, 0);
-	line_add_data(_line, 0, strlen(_text), _text);
+	line_insert_data(_line, 0, strlen(_text), _text);
 
 	print_success("Line created: 'ABCDEFGH'");
 
@@ -369,8 +369,8 @@ static int	test_buffer_line_join(void)
 	buffer_line_insert(_buffer, _line1, 0);
 	buffer_line_insert(_buffer, _line2, -1);
 
-	line_add_data(_line1, 0, strlen(_text1), _text1);
-	line_add_data(_line2, 0, strlen(_text2), _text2);
+	line_insert_data(_line1, 0, strlen(_text1), _text1);
+	line_insert_data(_line2, 0, strlen(_text2), _text2);
 
 	print_success("Two lines created");
 	printf("  %sLine 1%s: %s\n", BLUE, WHITE, _line1->data);
@@ -425,9 +425,9 @@ static int	test_buffer_get_line(void)
 	buffer_line_insert(_buffer, _line2, -1);
 	buffer_line_insert(_buffer, _line3, -1);
 
-	line_add_data(_line1, 0, 1, "1");
-	line_add_data(_line2, 0, 1, "2");
-	line_add_data(_line3, 0, 1, "3");
+	line_insert_data(_line1, 0, 1, "1");
+	line_insert_data(_line2, 0, 1, "2");
+	line_insert_data(_line3, 0, 1, "3");
 
 	print_success("Buffer with 3 lines created");
 
@@ -490,7 +490,7 @@ static int	test_buffer_destroy(void)
 	{
 		_line = line_create();
 		buffer_line_insert(_buffer, _line, -1);
-		line_add_data(_line, 0, 10, "Data_Line ");
+		line_insert_data(_line, 0, 10, "Data_Line ");
 	}
 
 	if (_buffer->size != 5)
@@ -519,7 +519,7 @@ int	test_internal_main(void)
 	_status = 0;
 	_status |= test_line_create();
 	_status |= test_buffer_create();
-	_status |= test_line_add_data();
+	_status |= test_line_insert_data();
 	_status |= test_line_delete_data();
 	_status |= test_buffer_line_insert();
 	_status |= test_buffer_line_split();

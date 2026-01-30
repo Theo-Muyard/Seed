@@ -30,12 +30,12 @@ bool	cmd_buffer_destroy(t_Manager *manager, const t_Command *cmd);
 bool	cmd_buffer_line_insert(t_Manager *manager, const t_Command *cmd);
 
 /**
- * @brief Destroys the given line.
+ * @brief Delete the given line.
  * @param manager The manager that will contains contexts.
  * @param cmd The content of the command.
  * @return TRUE for success or FALSE if an error occured.
 */
-bool	cmd_buffer_line_destroy(t_Manager *manager, const t_Command *cmd);
+bool	cmd_buffer_line_delete(t_Manager *manager, const t_Command *cmd);
 
 /**
  * @brief Splits the given line in two lines.
@@ -64,12 +64,12 @@ bool	cmd_buffer_get_line(t_Manager *manager, const t_Command *cmd);
 // +===----- Data -----===+ //
 
 /**
- * @brief Add the data to the given line.
+ * @brief Insert the data to the given line.
  * @param manager The manager that will contains contexts.
  * @param cmd The content of the command.
  * @return TRUE for success or FALSE if an error occured.
 */
-bool	cmd_line_add_data(t_Manager *manager, const t_Command *cmd);
+bool	cmd_line_insert_data(t_Manager *manager, const t_Command *cmd);
 
 /**
  * @brief Delete the data to the given line.

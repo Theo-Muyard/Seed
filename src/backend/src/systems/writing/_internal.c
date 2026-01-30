@@ -128,7 +128,7 @@ t_Line		*buffer_line_split(t_Buffer *buffer, t_Line *line, size_t index)
 	if (NULL == _new_line)
 		return (NULL);
 	_size = line->len - index;
-	if (false == line_add_data(_new_line, 0, _size, line->data + index))
+	if (false == line_insert_data(_new_line, 0, _size, line->data + index))
 		return (buffer_line_destroy(buffer, _new_line), NULL);
 	if (false == line_delete_data(line, index, _size))
 		return (buffer_line_destroy(buffer, _new_line), NULL);
@@ -146,7 +146,7 @@ t_Line		*buffer_line_join(t_Buffer *buffer, t_Line *dst, t_Line *src)
 {
 	if (NULL == dst || NULL == src)
 		return (NULL);
-	if (false == line_add_data(dst, dst->len, src->len, src->data))
+	if (false == line_insert_data(dst, dst->len, src->len, src->data))
 		return (NULL);
 	buffer_line_destroy(buffer, src);
 	return (dst);
@@ -175,7 +175,7 @@ t_Line		*buffer_get_line(t_Buffer *buffer, ssize_t index)
 
 // +===----- DATA -----===+ //
 
-bool		line_add_data(t_Line *line, ssize_t column, size_t size, const char *data)
+bool		line_insert_data(t_Line *line, ssize_t column, size_t size, const char *data)
 {
 	char	*_new_data;
 	size_t	_needed_capacity;

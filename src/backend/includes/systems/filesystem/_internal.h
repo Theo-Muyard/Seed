@@ -8,6 +8,7 @@
 
 typedef struct	s_Directory
 {
+	char		*absolute_path;
 	t_File		**files;
 	size_t		files_count;
 	size_t		files_capacity;
@@ -56,7 +57,7 @@ void		file_destroy(t_File *file);
  * @param file The file that will be added. 
  * @return TRUE for success or FALSE if an error occured.
 */
-bool		directory_add_file(t_Directory *dir, t_File *file);
+bool		directory_file_add(t_Directory *dir, t_File *file);
 
 /**
  * @brief Remove the given file.
@@ -99,7 +100,7 @@ bool		directory_contains_file(t_Directory *dir, t_File *file);
  * @param sub_dir The sub directory that will be added.
  * @return TRUE for success or FALSE if an error occured.
 */
-bool		directory_add_sub_directory(t_Directory *dir, t_Directory *sub_dir);
+bool		directory_sub_directory_add(t_Directory *dir, t_Directory *sub_dir);
 
 /**
  * @brief Remove the given sub directory.
@@ -107,7 +108,7 @@ bool		directory_add_sub_directory(t_Directory *dir, t_Directory *sub_dir);
  * @param file The sub_directory that will be removed.
  * @return TRUE for success or FALSE if an error occured.
 */
-bool		directory_remove_sub_directory(t_Directory *dir, t_Directory *sub_dir);
+bool		directory_sub_directory_remove(t_Directory *dir, t_Directory *sub_dir);
 
 /**
  * @brief Find a sub directory by its name in the given directory.
@@ -115,7 +116,7 @@ bool		directory_remove_sub_directory(t_Directory *dir, t_Directory *sub_dir);
  * @param dirname The name of the sub directory.
  * @return The file or NULL if not found.
 */
-t_File		*directory_find_sub_directory(t_Directory *dir, char *dirname);
+t_Directory	*directory_find_sub_directory(t_Directory *dir, char *dirname);
 
 /**
  * @brief Move a sub directory to src in dst directory.

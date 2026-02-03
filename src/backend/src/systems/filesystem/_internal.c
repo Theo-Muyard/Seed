@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <strings.h>
+#include <string.h>
 #include "systems/filesystem/_internal.h"
 
 #define FILES_ALLOC	32
@@ -14,6 +15,7 @@ t_Directory	*directory_create(void)
 	dir = malloc(sizeof(t_Directory));
 	if (NULL == dir)
 		return (NULL);
+	dir->absolute_path = NULL;
 	dir->files = NULL;
 	dir->files_count = 0;
 	dir->files_capacity = 0;
@@ -25,7 +27,7 @@ t_Directory	*directory_create(void)
 
 void		directory_destroy(t_Directory *dir)
 {
-	int _i;
+	size_t _i;
 
 	if (NULL == dir)
 		return ;
@@ -42,6 +44,7 @@ void		directory_destroy(t_Directory *dir)
 		directory_destroy(dir->sub_directory[_i]);
 		_i++;
 	}
+	free(dir->absolute_path);
 	free(dir->sub_directory);
 	free(dir);
 }
@@ -68,7 +71,7 @@ void		file_destroy(t_File *file)
 	free(file);
 }
 
-bool		directory_add_file(t_Directory *dir, t_File *file)
+bool		directory_file_add(t_Directory *dir, t_File *file)
 {
 	t_File	*_tmp;
 	size_t	_i;
@@ -117,13 +120,67 @@ bool		directory_file_remove(t_Directory *dir, t_File *file)
 		_i++;
 	if (dir->files[_i] != file)
 		return (false);
-	file_destroy(file);
 	dir->files[_i] = NULL;
 	dir->files_count--;
 	return (true); 
 }
 
-bool		directory_add_sub_directory(t_Directory *dir, t_Directory *sub_dir)
+t_File		*directory_find_file(t_Directory *dir, char *filename)
+{
+	char	*_f_name;
+	size_t	_i;
+
+	if (NULL == dir || NULL == filename)
+		return (NULL);
+	_i = 0;
+	while (_i < dir->files_capacity)
+	{
+		if (NULL != dir->files[_i])
+		{
+			if (NULL == dir->files[_i]->absolute_path)
+				continue;
+			_f_name = strrchr(dir->files[_i]->absolute_path, '/') + 1;
+			if (strcmp(_f_name, filename) == 0)
+				return (dir->files[_i]);
+		}
+		_i++;
+	}
+	return (NULL);
+}
+
+bool		directory_file_move(t_Directory *src, t_Directory *dst, t_File *file)
+{
+	t_File	*_tmp;
+
+	if (NULL == src || NULL == dst || NULL == file)
+		return (false);
+	_tmp = file;
+	if (false == directory_file_remove(src, file))
+		return (false);
+	if (false == directory_file_add(dst, _tmp))
+		return (false);
+	return (true);
+}
+
+bool		directory_contains_file(t_Directory *dir, t_File *file)
+{
+	size_t	_i;
+
+	if (NULL == dir || NULL == file)
+		return (false);
+	_i = 0;
+	while (_i < dir->files_capacity)
+	{
+		if (file == dir->files[_i])
+			return (true);
+		_i++;
+	}
+	return (false);
+}
+
+// +===----- Sub directory -----===+ //
+
+bool		directory_sub_directory_add(t_Directory *dir, t_Directory *sub_dir)
 {
 	t_Directory	*_tmp;
 	size_t		_i;
@@ -161,7 +218,7 @@ bool		directory_add_sub_directory(t_Directory *dir, t_Directory *sub_dir)
 	return (true);
 }
 
-bool		directory_remove_sub_directory(t_Directory *dir, t_Directory *sub_dir)
+bool		directory_sub_directory_remove(t_Directory *dir, t_Directory *sub_dir)
 {
 	size_t	_i;
 
@@ -172,9 +229,60 @@ bool		directory_remove_sub_directory(t_Directory *dir, t_Directory *sub_dir)
 		_i++;
 	if (dir->sub_directory[_i] != sub_dir)
 		return (false);
-	directory_destroy(sub_dir);
 	dir->sub_directory[_i] = NULL;
 	dir->sub_dir_count--;
 	return (true);
 }
 
+t_Directory	*directory_find_sub_directory(t_Directory *dir, char *dirname)
+{
+	char	*_d_name;
+	size_t	_i;
+
+	if (NULL == dir || NULL == dirname)
+		return (NULL);
+	_i = 0;
+	while (_i < dir->sub_dir_capacity)
+	{
+		if (NULL != dir->sub_directory[_i])
+		{
+			if (NULL == dir->sub_directory[_i]->absolute_path)
+				continue;
+			_d_name = strrchr(dir->sub_directory[_i]->absolute_path, '/') + 1;
+			if (strcmp(_d_name, dirname) == 0)
+				return (dir->sub_directory[_i]);
+		}
+		_i++;
+	}
+	return (NULL);
+}
+
+bool		directory_sub_directory_move(t_Directory *src, t_Directory *dst, t_Directory *sub_dir)
+{
+	t_Directory	*_tmp;
+
+	if (NULL == src || NULL == dst || NULL == sub_dir)
+		return (false);
+	_tmp = sub_dir;
+	if (false == directory_sub_directory_remove(src, sub_dir))
+		return (false);
+	if (false == directory_sub_directory_add(dst, _tmp))
+		return (false);
+	return (true);
+}
+
+bool		directory_contains_sub_directory(t_Directory *dir, t_Directory *sub_dir)
+{
+	size_t	_i;
+
+	if (NULL == dir || NULL == sub_dir)
+		return (false);
+	_i = 0;
+	while (_i < dir->sub_dir_capacity)
+	{
+		if (sub_dir == dir->sub_directory[_i])
+			return (true);
+		_i++;
+	}
+	return (false);
+}

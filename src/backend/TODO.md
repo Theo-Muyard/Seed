@@ -71,35 +71,8 @@
 
 **Impact:** Sécurité, stabilité, prévention de crash
 
-- ⬜ **Créer un validateur générique**
-  - [ ] Définir un schéma de validation (structure descriptive)
-  - [ ] Implémenter `validate_payload()` générique
-  - [ ] Supporter min/max de taille, types, formats
-  - [ ] Support des champs obligatoires vs optionnels
-
-- ⬜ **Schémas de validation par commande**
-  - [ ] Créer un schéma pour chaque command (MAP ou table)
-  - [ ] Exemple : `CMD_WRITING_CREATE_BUFFER` → schema avec champs attendus
-  - [ ] Documenter les schémas dans la docstring de la commande
-
-- ⬜ **Validation centralisée dans dispatcher**
-  - [ ] Valider chaque payload avant d'appeler le handler
-  - [ ] Retourner l'erreur de validation si invalide
-  - [ ] Logger les validations échouées
-
-- ⬜ **Cas limites & sécurité**
-  - [ ] NULL payloads (ok? ou erreur?)
-  - [ ] Buffers overflow (size > MAX_PAYLOAD_SIZE?)
-  - [ ] Champs string : vérifier null-termination
-  - [ ] Nested structures : validation récursive?
-
-- ⬜ **Tests exhaustifs**
-  - [ ] Valeur nulle pour chaque champ requis
-  - [ ] Valeurs limites (min, max)
-  - [ ] Strings malformées
-  - [ ] Payloads trop volumineux
-  - [ ] Payloads vides
-
+- ✅ **Créer un validateur générique**
+  - [x] Définir un schéma de validation (structure descriptive)
 ---
 
 ### 4️⃣ Système de Gestion de Fichiers
@@ -107,7 +80,7 @@
 **Impact:** Persistance, import/export, intégration système
 
 - ⬜ **Spécifier l'API de fichiers**
-  - [ ] Créer les headers `includes/systems/filesystem`
+  - [x] Créer les headers `includes/systems/filesystem`
   - [ ] Définir les opérations : create, delete, open, save, close
   - [ ] Supporter les chemins absolus et relatifs
   - [ ] Supporter encodage UTF-8 minimum

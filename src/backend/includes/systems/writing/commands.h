@@ -1,6 +1,8 @@
 #ifndef SEED_WRITING_COMMANDS_H
 # define SEED_WRITING_COMMANDS_H
 
+# include "core/manager.h"
+
 // +===----- Buffer -----===+ //
 
 /**

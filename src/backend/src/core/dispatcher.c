@@ -4,11 +4,12 @@
 #include "core/dispatcher.h"
 
 /**
- * @brief Search for the function associated with the given ID.
+ * @brief Search for the entry associated with the given ID.
  * @param dispatcher The dispatcher that will contains commands.
  * @param id The id of the command.
+ * @return The command entry associated with the given ID, or NULL if not found.
 */
-static t_Fn	search_function(t_Dispatcher *dispatcher, t_CommandId id)
+static t_CommandEntry	*search_command_entry(t_Dispatcher *dispatcher, t_CommandId id)
 {
 	size_t	_count;
 	size_t	_i;
@@ -20,7 +21,7 @@ static t_Fn	search_function(t_Dispatcher *dispatcher, t_CommandId id)
 	while (_i < _count)
 	{
 		if (dispatcher->commands[_i].id == id)
-			return (dispatcher->commands[_i].fn);
+			return (&dispatcher->commands[_i]);
 		_i++;
 	}
 	return (NULL);
@@ -53,7 +54,12 @@ void	dispatcher_clean(t_Dispatcher *dispatcher)
 	free(dispatcher);
 }
 
-bool	dispatcher_register(t_Dispatcher *dispatcher, t_CommandId id, t_Fn fn)
+bool	dispatcher_register(
+	t_Dispatcher *dispatcher,
+	t_CommandId id,
+	size_t size,
+	t_Fn fn
+)
 {
 	t_CommandEntry	_entry;
 	size_t			_count;
@@ -66,6 +72,7 @@ bool	dispatcher_register(t_Dispatcher *dispatcher, t_CommandId id, t_Fn fn)
 	if (_count >= dispatcher->capacity)
 		return (false);
 	_entry.id = id;
+	_entry.size = size;
 	_entry.fn = fn;
 	dispatcher->commands[_count] = _entry;
 	dispatcher->count++;
@@ -74,7 +81,7 @@ bool	dispatcher_register(t_Dispatcher *dispatcher, t_CommandId id, t_Fn fn)
 
 t_ErrorCode	dispatcher_exec(t_Manager *manager, const t_Command *cmd)
 {
-	t_Fn			_fn;
+	t_CommandEntry	*_cmd_entry;
 
 	if (NULL == manager)
 		return (ERR_INVALID_MANAGER);
@@ -82,11 +89,11 @@ t_ErrorCode	dispatcher_exec(t_Manager *manager, const t_Command *cmd)
 		return (ERR_INVALID_COMMAND);
 	if (NULL == manager->dispatcher)
 		return (ERR_DISPATCHER_NOT_INITIALIZED);
-	if (NULL == cmd->payload)
-		return (ERR_INVALID_PAYLOAD);
 
-	_fn = search_function(manager->dispatcher, cmd->id);
-	if (NULL == _fn)
+	_cmd_entry = search_command_entry(manager->dispatcher, cmd->id);
+	if (NULL == _cmd_entry)
 		return (ERR_INVALID_COMMAND_ID);
-	return (_fn(manager, cmd));
+	if (sizeof(cmd->payload) != _cmd_entry->size)
+		return (ERR_INVALID_PAYLOAD);
+	return (_cmd_entry->fn(manager, cmd));
 }

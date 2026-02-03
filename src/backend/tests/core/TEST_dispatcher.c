@@ -99,7 +99,7 @@ static int	test_dispatcher_register(void)
 
 	_dispatcher = _manager->dispatcher;
 
-	if (false == dispatcher_register(_dispatcher, CMD_WRITING_CREATE_BUFFER, test_handler_success))
+	if (false == dispatcher_register(_dispatcher, CMD_WRITING_CREATE_BUFFER, sizeof(t_CmdCreateBuffer), test_handler_success))
 		return (print_error("Failed to register first command"), 1);
 	print_success("Registered CMD_WRITING_CREATE_BUFFER");
 
@@ -107,13 +107,13 @@ static int	test_dispatcher_register(void)
 		return (print_error("Count should be 1 after registration"), 1);
 	print_success("Count incremented to 1");
 
-	if (false == dispatcher_register(_dispatcher, CMD_WRITING_DELETE_BUFFER, test_handler_success))
+	if (false == dispatcher_register(_dispatcher, CMD_WRITING_DELETE_BUFFER, sizeof(t_CmdDestroyBuffer), test_handler_success))
 		return (print_error("Failed to register second command"), 1);
 	print_success("Registered CMD_WRITING_DELETE_BUFFER");
 
 	printf("  %sTotal registered commands%s: %zu\n", BLUE, WHITE, _dispatcher->count);
 
-	if (true == dispatcher_register(_dispatcher, CMD_WRITING_DELETE_LINE, NULL))
+	if (true == dispatcher_register(_dispatcher, CMD_WRITING_DELETE_LINE, sizeof(t_CmdDeleteLine), NULL))
 		return (print_error("Should reject NULL function pointer"), 1);
 	print_success("Correctly rejected NULL function pointer");
 
@@ -139,7 +139,7 @@ static int	test_dispatcher_exec(void)
 
 	_dispatcher = _manager->dispatcher;
 
-	if (false == dispatcher_register(_dispatcher, CMD_WRITING_CREATE_BUFFER, test_handler_success))
+	if (false == dispatcher_register(_dispatcher, CMD_WRITING_CREATE_BUFFER, sizeof(t_CmdCreateBuffer), test_handler_success))
 		return (print_error("Failed to register command"), 1);
 
 	_cmd.id = CMD_WRITING_CREATE_BUFFER;
@@ -149,7 +149,7 @@ static int	test_dispatcher_exec(void)
 		return (print_error("Failed to execute registered command"), 1);
 	print_success("Executed CMD_WRITING_CREATE_BUFFER successfully");
 
-	if (false == dispatcher_register(_dispatcher, CMD_WRITING_DELETE_BUFFER, test_handler_failure))
+	if (false == dispatcher_register(_dispatcher, CMD_WRITING_DELETE_BUFFER, sizeof(t_CmdDestroyBuffer), test_handler_failure))
 		return (print_error("Failed to register failure handler"), 1);
 
 	_cmd.id = CMD_WRITING_DELETE_BUFFER;
@@ -187,8 +187,8 @@ static int	test_dispatcher_clean(void)
 
 	_dispatcher = _manager->dispatcher;
 
-	dispatcher_register(_dispatcher, CMD_WRITING_CREATE_BUFFER, test_handler_success);
-	dispatcher_register(_dispatcher, CMD_WRITING_DELETE_BUFFER, test_handler_success);
+	dispatcher_register(_dispatcher, CMD_WRITING_CREATE_BUFFER, sizeof(t_CmdCreateBuffer), test_handler_success);
+	dispatcher_register(_dispatcher, CMD_WRITING_DELETE_BUFFER, sizeof(t_CmdDestroyBuffer), test_handler_success);
 
 	printf("  %sCommands registered%s: %zu\n", BLUE, WHITE, _dispatcher->count);
 

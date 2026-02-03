@@ -59,11 +59,6 @@
   - [x] Ajouter des codes pour les erreurs communes (allocation, validation, etc)
   - [x] Exemple : `ERR_BUFFER_NOT_FOUND`, `ERR_INVALID_PAYLOAD`, etc
 
-- ⬜ **Créer la structure de retour**
-  - [ ] Définir `t_Result` ou `t_Status` (avec code + message optionnel)
-  - [ ] Ou créer des fonctions qui remplissent une `t_Error` en output
-  - [ ] Décider: retour booléen → retour structuré ou output param?
-
 - ✅ **Mettre à jour toutes les fonctions**
   - [x] Manager : `manager_exec()`, `manager_init()`, etc
   - [x] Dispatcher : toutes les fonctions

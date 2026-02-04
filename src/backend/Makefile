@@ -30,7 +30,11 @@ SRC			=	core/manager.c \
 \
 				systems/writing/_internal.c \
 				systems/writing/commands.c \
-				systems/writing/system.c
+				systems/writing/system.c \
+\
+				systems/filesystem/_internal.c \
+				systems/filesystem/commands.c \
+				systems/filesystem/system.c \
 
 # | ================================================ |
 # 					OBJ FILES

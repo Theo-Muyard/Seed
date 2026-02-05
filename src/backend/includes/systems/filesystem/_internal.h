@@ -70,10 +70,10 @@ bool		directory_file_remove(t_Directory *dir, t_File *file);
 /**
  * @brief Find a file by its name in the given directory.
  * @param dir The directory that contains files and sub directory.
- * @param filename The name of the file.
+ * @param path The path of the file.
  * @return The file or NULL if not found.
 */
-t_File		*directory_find_file(t_Directory *dir, char *filename);
+t_File		*directory_find_file(t_Directory *dir, char *path);
 
 /**
  * @brief Move a file to src in dst directory.
@@ -113,10 +113,10 @@ bool		directory_sub_directory_remove(t_Directory *dir, t_Directory *sub_dir);
 /**
  * @brief Find a sub directory by its name in the given directory.
  * @param dir The directory that contains files and sub directory.
- * @param dirname The name of the sub directory.
+ * @param path The path of the sub directory.
  * @return The file or NULL if not found.
 */
-t_Directory	*directory_find_sub_directory(t_Directory *dir, char *dirname);
+t_Directory	*directory_find_sub_directory(t_Directory *dir, char *path);
 
 /**
  * @brief Move a sub directory to src in dst directory.

@@ -138,15 +138,13 @@ typedef struct	s_CmdDeleteData
 
 typedef struct	s_CmdCreateDir
 {
-	char			*parent_dirname;
-	char			*dirname;
+	char			*path;
 	unsigned int	mode;
 }	t_CmdCreateDir;
 
 typedef struct	s_CmdDeleteDir
 {
-	char	*parent_dirname;
-	char	*dirname;
+	char	*path;
 }	t_CmdDeleteDir;
 
 typedef struct	s_CmdMoveDir
@@ -157,7 +155,7 @@ typedef struct	s_CmdMoveDir
 
 typedef struct	s_CmdCreateFile
 {
-	char	*path;
+	char			*path;
 	unsigned int	mode;
 }	t_CmdCreateFile;
 
@@ -183,7 +181,6 @@ typedef struct	s_CmdEditDataFile
 {
 	char	*path;
 	char	*data;
-	size_t	len;
 }	t_CmdEditDataFile;
 
 // +===----- Functions -----===+ //

@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "tools/memory.h"
 
 char	*ft_strdup(const char *str)
@@ -8,7 +9,7 @@ char	*ft_strdup(const char *str)
 
 	if (NULL == str)
 		return (NULL);
-	ptr = malloc((ft_strlen(str) + 1) * sizeof(char));
+	ptr = malloc((strlen(str) + 1) * sizeof(char));
 	if (NULL == ptr)
 		return (NULL);
 	_i = 0;

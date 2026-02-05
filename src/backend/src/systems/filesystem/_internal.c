@@ -195,12 +195,11 @@ bool		directory_file_remove(t_Directory *dir, t_File *file)
 	return (true); 
 }
 
-t_File		*directory_find_file(t_Directory *dir, char *filename)
+t_File		*directory_find_file(t_Directory *dir, char *path)
 {
-	char	*_f_name;
 	size_t	_i;
 
-	if (NULL == dir || NULL == filename)
+	if (NULL == dir || NULL == path)
 		return (NULL);
 	_i = 0;
 	while (_i < dir->files_count)
@@ -212,12 +211,7 @@ t_File		*directory_find_file(t_Directory *dir, char *filename)
 				_i++;
 				continue;
 			}
-			_f_name = strrchr(dir->files[_i]->absolute_path, '/');
-			if (NULL == _f_name)
-				_f_name = dir->files[_i]->absolute_path;
-			else
-				_f_name++;
-			if (strcmp(_f_name, filename) == 0)
+			if (strcmp(dir->files[_i]->absolute_path, path) == 0)
 				return (dir->files[_i]);
 		}
 		_i++;
@@ -311,12 +305,12 @@ bool		directory_sub_directory_remove(t_Directory *dir, t_Directory *sub_dir)
 	return (true);
 }
 
-t_Directory	*directory_find_sub_directory(t_Directory *dir, char *dirname)
+t_Directory	*directory_find_sub_directory(t_Directory *dir, char *path)
 {
 	char	*_d_name;
 	size_t	_i;
 
-	if (NULL == dir || NULL == dirname)
+	if (NULL == dir || NULL == path)
 		return (NULL);
 	_i = 0;
 	while (_i < dir->sub_dir_count)
@@ -328,12 +322,7 @@ t_Directory	*directory_find_sub_directory(t_Directory *dir, char *dirname)
 				_i++;
 				continue;
 			}
-			_d_name = strrchr(dir->sub_directory[_i]->absolute_path, '/');
-			if (NULL == _d_name)
-				_d_name = dir->sub_directory[_i]->absolute_path;
-			else
-				_d_name++;
-			if (strcmp(_d_name, dirname) == 0)
+			if (strcmp(dir->sub_directory[_i]->absolute_path, path) == 0)
 				return (dir->sub_directory[_i]);
 		}
 		_i++;

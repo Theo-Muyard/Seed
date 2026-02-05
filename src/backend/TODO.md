@@ -81,29 +81,28 @@
 
 - ⬜ **Spécifier l'API de fichiers**
   - [x] Créer les headers `includes/systems/filesystem`
-  - [ ] Définir les opérations : create, delete, open, save, close
-  - [ ] Supporter les chemins absolus et relatifs
-  - [ ] Supporter encodage UTF-8 minimum
+  - [ ] Définir les opérations : create, delete, open, save, edit_path, edit_data
+  - [ ] Supporter les chemins absolus
 
 - ⬜ **Opération : Ouvrir un fichier**
-  - [ ] `filesystem_open(path, mode)` → file_handle
+  - [ ] `filesystem_open()` → file_handle
   - [ ] Charger dans un nouveau buffer
   - [ ] Détecter l'encodage automatiquement
   - [ ] Retourner erreur si fichier inexistant
   - [ ] Mapping fichier ↔ buffer_id pour tracking
 
 - ⬜ **Opération : Sauvegarder un buffer**
-  - [ ] `filesystem_save(buffer_id, path)` → erreur ou succès
+  - [ ] `filesystem_save()` → erreur ou succès
   - [ ] Supporter overwrite/no-overwrite
   - [ ] Créer le répertoire parent si besoin
   - [ ] Atomic write (écrire dans temp, puis rename)
   - [ ] Préserver permissions/timestamps optionnels
 
-- ⬜ **Opération : Fermer un fichier**
+<!-- - ⬜ **Opération : Fermer un fichier**
   - [ ] `filesystem_close(file_handle)`
   - [ ] Nettoyer les ressources
   - [ ] Optionnel: sauvegarder avant fermeture?
-  - [ ] Optionnel: demander confirmation si modifié?
+  - [ ] Optionnel: demander confirmation si modifié? -->
 
 - ⬜ **Intégration avec le Manager**
   - [ ] Ajouter les commandes filesystem au dispatcher

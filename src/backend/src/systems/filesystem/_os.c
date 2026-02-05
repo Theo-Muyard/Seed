@@ -1,33 +1,30 @@
 #include <fcntl.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include "systems/filesystem/_os.h"
 
-// +===----- OS Files -----===+ //
+// +===----- OS Directory -----===+ //
 
-FILE	*os_file_create(char *path)
+bool	os_dir_create(char *path, unsigned int mode)
 {
-	FILE	*file;
-
 	if (NULL == path)
-		return (NULL);
-	file = fopen(path, "r");
-	if (NULL != file)
-		return (fclose(file), NULL);
-	file = fopen(path, "w");
-	return (file);	
+		return (false);
+	if (-1 == mkdir(path, mode))
+		return (false);
+	return (true);
 }
 
-FILE	*os_file_open(char *path)
+bool	os_dir_delete(char *path)
 {
-	FILE	*file;
-
 	if (NULL == path)
-		return (NULL);
-	file = fopen(path, "r");
-	return (file);
+		return (false);
+	if (-1 == rmdir(path))
+		return (false);
+	return (true);
 }
 
-bool	*os_file_edit_path(char *old_path, char *new_path)
+bool	os_dir_edit_path(char *old_path, char *new_path)
 {
 	if (NULL == old_path || NULL == new_path)
 		return (false);
@@ -36,7 +33,50 @@ bool	*os_file_edit_path(char *old_path, char *new_path)
 	return (true);
 }
 
-bool	*os_file_edit_data(FILE *file, char *data)
+// +===----- OS Files -----===+ //
+
+FILE	*os_file_create(char *path, char *mode)
+{
+	FILE	*file;
+
+	if (NULL == path || NULL == mode)
+		return (NULL);
+	file = fopen(path, "r");
+	if (NULL != file)
+		return (fclose(file), NULL);
+	file = fopen(path, mode);
+	return (file);	
+}
+
+bool	os_file_delete(char *path)
+{
+	if (NULL == path)
+		return (false);
+	if (-1 == remove(path))
+		return (false);
+	return (true);
+}
+
+FILE	*os_file_open(char *path, char *mode)
+{
+	FILE	*file;
+
+	if (NULL == path || NULL == mode)
+		return (NULL);
+	file = fopen(path, mode);
+	return (file);
+}
+
+bool	os_file_edit_path(char *old_path, char *new_path)
+{
+	if (NULL == old_path || NULL == new_path)
+		return (false);
+	if (-1 == rename(old_path, new_path))
+		return (false);
+	return (true);
+}
+
+bool	os_file_edit_data(FILE *file, char *data)
 {
 	if (NULL == file || NULL == data)
 		return (false);
@@ -45,7 +85,7 @@ bool	*os_file_edit_data(FILE *file, char *data)
 	return (true);
 }
 
-bool	*os_file_save(FILE *file)
+bool	os_file_save(FILE *file)
 {
 	if (NULL == file)
 		return (false);
@@ -69,8 +109,10 @@ char	*os_file_get_data(FILE *file)
 	if (NULL == buffer)
 		return (NULL);
 	_read = fread(buffer, 1, _size, file);
+	rewind(file);
 	if (_size != _read)
 		return (free(buffer), NULL);
 	buffer[_size] = '\0';
 	return (buffer);
 }
+

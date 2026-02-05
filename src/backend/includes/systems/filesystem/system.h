@@ -8,34 +8,33 @@
 
 typedef struct s_CommandEntry	t_CommandEntry;
 typedef struct s_Manager		t_Manager;
-typedef struct s_Buffer			t_Buffer;
-
-// TODO: Changer pour filesystem 
+typedef struct s_Directory		t_Directory;
 
 typedef struct s_FileSystemCtx
 {
-	
+	t_Directory	*root;
 }	t_FileSystemCtx;
 
 // // +===----- Commands -----===+ //
 
-// # define WRITING_COMMANDS_COUNT 9
+# define FS_COMMANDS_COUNT 8
 
-// extern const t_CommandEntry	writing_commands[];
+extern const t_CommandEntry	fs_commands[];
 
 // // +===----- Functions -----===+ //
 
-// /**
-//  * @brief Initialize the writing system.
-//  * @param manager The seed core manager.
-//  * @return TRUE for success or FALSE if an error occured.
-// */
-// bool	writing_init(t_Manager	*manager);
+/**
+ * @brief Initialize the filesystem system.
+ * @param manager The seed core manager.
+ * @param root_path The root path.
+ * @return TRUE for success or FALSE if an error occured.
+*/
+bool	fs_init(t_Manager	*manager, char *root_path);
 
-// /**
-//  * @brief Clean the writing system.
-//  * @param ctx The writing context.
-// */
-// void	writing_clean(t_WritingCtx *ctx);
+/**
+ * @brief Clean the writing system.
+ * @param ctx The filesystem context.
+*/
+void	fs_clean(t_Directory *ctx);
 
 #endif

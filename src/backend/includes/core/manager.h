@@ -6,15 +6,17 @@
 
 // +===----- Types -----===+ //
 
-typedef enum e_ErrorCode	t_ErrorCode;
-typedef struct s_Command	t_Command;
-typedef struct s_Dispatcher	t_Dispatcher;
-typedef struct s_WritingCtx	t_WritingCtx;
+typedef enum e_ErrorCode		t_ErrorCode;
+typedef struct s_Command		t_Command;
+typedef struct s_Dispatcher		t_Dispatcher;
+typedef struct s_WritingCtx		t_WritingCtx;
+typedef struct s_FileSystemCtx	t_FileSystemCtx;
 
 typedef struct	s_Manager
 {
 	t_Dispatcher		*dispatcher;
 	t_WritingCtx		*writing_ctx;
+	t_FileSystemCtx		*fs_ctx;
 }	t_Manager;
 
 // +===----- Functions -----===+ //

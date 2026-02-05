@@ -2,6 +2,7 @@
 #include "core/manager.h"
 #include "core/dispatcher.h"
 #include "systems/writing/system.h"
+#include "systems/filesystem/system.h"
 
 // +===----- Functions -----===+ //
 
@@ -13,7 +14,7 @@ t_Manager	*manager_init(void)
 	manager = malloc(sizeof(t_Manager));
 	if (NULL == manager)
 		return (NULL);
-	_size = WRITING_COMMANDS_COUNT;
+	_size = WRITING_COMMANDS_COUNT + FS_COMMANDS_COUNT;
 	if (false == dispatcher_init(manager, _size))
 		return (manager_clean(manager), NULL);
 	if (false == writing_init(manager))

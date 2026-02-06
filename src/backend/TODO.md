@@ -98,12 +98,6 @@
   - [ ] Atomic write (écrire dans temp, puis rename)
   - [ ] Préserver permissions/timestamps optionnels
 
-<!-- - ⬜ **Opération : Fermer un fichier**
-  - [ ] `filesystem_close(file_handle)`
-  - [ ] Nettoyer les ressources
-  - [ ] Optionnel: sauvegarder avant fermeture?
-  - [ ] Optionnel: demander confirmation si modifié? -->
-
 - ⬜ **Intégration avec le Manager**
   - [ ] Ajouter les commandes filesystem au dispatcher
   - [ ] Mapping persistent des fichiers ouverts

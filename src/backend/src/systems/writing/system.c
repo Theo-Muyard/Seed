@@ -1,7 +1,9 @@
 #include <stdlib.h>
 #include "core/manager.h"
 #include "core/dispatcher.h"
+#include "tools/systems.h"
 #include "systems/writing/_internal.h"
+#include "systems/writing/commands.h"
 #include "systems/writing/system.h"
 
 // +===----- Commands Definition -----===+ //
@@ -17,33 +19,8 @@ const t_CommandEntry	writing_commands[] = {
 	{ CMD_WRITING_GET_LINE,			sizeof(t_CmdGetLine),		cmd_buffer_get_line},
 	
 	{ CMD_WRITING_INSERT_TEXT,		sizeof(t_CmdInsertData),	cmd_line_insert_data},
-	{ CMD_WRITING_DELETE_TEXT,		sizeof(t_CmdDeleteData),	cmd_line_delete_data},
+	{ CMD_WRITING_DELETE_TEXT,		sizeof(t_CmdDeleteData),	cmd_line_delete_data}
 };
-
-/**
- * @brief Registers the commands into the dispatcher.
- * @param dispatcher The dispatcher that will contains commands.
- * @param commands The container for all write command entries.
- * @param count The count of commands.
-*/
-static bool	register_commands(t_Dispatcher *dispatcher, const t_CommandEntry *commands, size_t count)
-{
-	size_t	_i;
-
-	_i = 0;
-	while (_i < count)
-	{
-		if (false == dispatcher_register(
-			dispatcher,
-			commands[_i].id,
-			commands[_i].size,
-			commands[_i].fn)
-		)
-			return (false);
-		_i++;
-	}
-	return (true);
-}
 
 bool	writing_init(t_Manager	*manager)
 {

@@ -1,65 +1,46 @@
-#include <stdlib.h>
-#include <string.h>
+#include "dependency.h"
 #include "core/manager.h"
 #include "core/dispatcher.h"
 #include "tools/memory.h"
+#include "tools/systems.h"
 #include "systems/filesystem/_internal.h"
 #include "systems/filesystem/_os.h"
+#include "systems/filesystem/commands.h"
 #include "systems/filesystem/system.h"
 
 // +===----- Commands Definition -----===+ //
 
-// TODO: Complete
 const t_CommandEntry	fs_commands[] = {
+	{ CMD_FS_CREATE_DIR,	sizeof(t_CmdCreateDir),		cmd_directory_create },
+	{ CMD_FS_DELETE_DIR,	sizeof(t_CmdDeleteDir),		cmd_directory_delete },
+	{ CMD_FS_MOVE_DIR,		sizeof(t_CmdMoveDir),		cmd_directory_move },
+
+	{ CMD_FS_CREATE_FILE,	sizeof(t_CmdCreateFile),	cmd_file_create },
+	{ CMD_FS_DELETE_FILE,	sizeof(t_CmdDeleteFile),	cmd_file_delete },
+	{ CMD_FS_MOVE_FILE,		sizeof(t_CmdMoveFile),		cmd_file_move },
+	{ CMD_FS_READ_FILE,		sizeof(t_CmdReadFile),		cmd_file_read },
+	{ CMD_FS_EDIT_FILE,		sizeof(t_CmdEditDataFile),	cmd_file_edit_data }
 };
 
-/**
- * @brief Registers the commands into the dispatcher.
- * @param dispatcher The dispatcher that will contains commands.
- * @param commands The container for all write command entries.
- * @param count The count of commands.
-*/
-static bool	register_commands(t_Dispatcher *dispatcher, const t_CommandEntry *commands, size_t count)
-{
-	size_t	_i;
-
-	_i = 0;
-	while (_i < count)
-	{
-		if (false == dispatcher_register(
-			dispatcher,
-			commands[_i].id,
-			commands[_i].size,
-			commands[_i].fn)
-		)
-			return (false);
-		_i++;
-	}
-	return (true);
-}
-
-bool	fs_init(t_Manager	*manager, char *root_path)
+bool	fs_init(t_Manager	*manager, char *root_dirname)
 {
 	t_FileSystemCtx		*_ctx;
 
-	if (NULL == manager)
-		return (false);
-	if (NULL == manager->dispatcher)
-		return (false);
+	TEST_NULL(manager, false);
+	TEST_NULL(manager->dispatcher, false);
 	_ctx = malloc(sizeof(t_FileSystemCtx));
-	if (NULL == _ctx)
-		return (false);
+	TEST_NULL(_ctx, false);
 	_ctx->root = malloc(sizeof(t_Directory));
-	if (NULL == _ctx->root)
-		return (false);
+	TEST_NULL(_ctx->root, false);
 	if (false == register_commands(
 		manager->dispatcher,
 		fs_commands,
 		FS_COMMANDS_COUNT
 	))
 		return (free(_ctx->root), free(_ctx), false);
-	_ctx->root->absolute_path = ft_strdup(root_path);
-	if (NULL == _ctx->root->absolute_path)
+	_ctx->root->dirname = ft_strdup(root_dirname);
+	_ctx->root->parent = NULL;
+	if (NULL == _ctx->root->dirname)
 		return (free(_ctx->root), free(_ctx), false);
 	manager->fs_ctx = _ctx;
 	return (true);

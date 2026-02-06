@@ -1,39 +1,62 @@
 #ifndef SEED_FILESYSTEM_INTERNAL_H
 # define SEED_FILESYSTEM_INTERNAL_H
 
-# include <sys/types.h>
-# include <stdbool.h>
+# include "dependency.h"
+
+# define FILE_ALLOC 32
+# define DIR_ALLOC 32
 
 // +===----- Types -----===+ //
 
-typedef struct	s_Directory
-{
-	char		*absolute_path;
-	t_File		**files;
-	size_t		files_count;
-	size_t		files_capacity;
-	t_Directory	**sub_directory;
-	size_t		sub_dir_count;
-	size_t		sub_dir_capacity;
-}	t_Directory;
-
 typedef struct	s_File
 {
-	ssize_t	buffer_id;
-	char	*absolute_path;
+	char				*filename;
+	struct s_Directory	*parent;
 }	t_File;
+
+typedef struct	s_Directory
+{
+	char				*dirname;
+	struct s_Directory	*parent;
+
+	t_File				**files;
+	size_t				files_count;
+	size_t				files_capacity;
+
+	struct s_Directory	**subdir;
+	size_t				subdir_count;
+	size_t				subdir_capacity;
+}	t_Directory;
+
+// +===----- Path -----===+ //
+
+/**
+ * @brief Get the absolute path of a dir.
+ * @param dir The dir to find his absolute path.
+ * @return The absolute path.
+*/
+char		*directory_get_absolute_path(const t_Directory *dir);
+
+/**
+ * @brief Get the absolute path of a file.
+ * @param file The file to find his absolute path.
+ * @return The absolute path.
+*/
+char		*file_get_absolute_path(const t_File *file);
 
 // +===----- Directory -----===+ //
 
 /**
  * @brief Creates a new empty directory.
+ * @param parent The parent directory.
+ * @param dirname The name of the directory that will be created.
  * @return The directory that has just been created.
 */
-t_Directory	*directory_create(void);
+t_Directory	*directory_create(t_Directory *parent, const char *dirname);
 
 /**
  * @brief Destroys the given directory.
- * @dir The directory that will be destroyed.
+ * @param dir The directory that will be destroyed.
 */
 void		directory_destroy(t_Directory *dir);
 
@@ -41,9 +64,11 @@ void		directory_destroy(t_Directory *dir);
 
 /**
  * @brief Creates a new empty file.
+ * @param parent The parent directory.
+ * @param filename The name of the file that will be created.
  * @return The file that has just been created.
 */
-t_File		*file_create(void);
+t_File		*file_create(t_Directory *parent, const char *filename);
 
 /**
  * @brief Destroys the given file.
@@ -69,20 +94,28 @@ bool		directory_file_remove(t_Directory *dir, t_File *file);
 
 /**
  * @brief Find a file by its name in the given directory.
- * @param dir The directory that contains files and sub directory.
- * @param path The path of the file.
+ * @param parent The parent directory of the file that contains files and sub directory.
+ * @param filename The name of the file.
  * @return The file or NULL if not found.
 */
-t_File		*directory_find_file(t_Directory *dir, char *path);
+t_File		*directory_find_file(t_Directory *parent, const char *filename);
 
 /**
- * @brief Move a file to src in dst directory.
- * @param src The source directory.
+ * @brief Resolve a relative path.
+ * @param root The root directory.
+ * @param path The relative path of the file.
+ * @return The file if it was find or NULL.
+*/
+t_File		*file_resolve(t_Directory *root, const char *path);
+
+/**
+ * @brief Move a file in src to dst directory.
  * @param dst The destination directory.
+ * @param src The source directory.
  * @param file The file that will be moved.
  * @return TRUE for success or FALSE if an error occured.
 */
-bool		directory_file_move(t_Directory *src, t_Directory *dst, t_File *file);
+bool		directory_file_move(t_Directory *dst, t_Directory *src, t_File *file);
 
 /**
  * @brief Check if the directory contains a specific file.
@@ -97,42 +130,50 @@ bool		directory_contains_file(t_Directory *dir, t_File *file);
 /**
  * @brief Add the given sub directory to the directory.
  * @param dir The directory that contains files.
- * @param sub_dir The sub directory that will be added.
+ * @param subdir The sub directory that will be added.
  * @return TRUE for success or FALSE if an error occured.
 */
-bool		directory_sub_directory_add(t_Directory *dir, t_Directory *sub_dir);
+bool		directory_subdir_add(t_Directory *dir, t_Directory *subdir);
 
 /**
  * @brief Remove the given sub directory.
  * @param dir The directory that contains files.
- * @param file The sub_directory that will be removed.
+ * @param file The subdirectory that will be removed.
  * @return TRUE for success or FALSE if an error occured.
 */
-bool		directory_sub_directory_remove(t_Directory *dir, t_Directory *sub_dir);
+bool		directory_subdir_remove(t_Directory *dir, t_Directory *subdir);
 
 /**
  * @brief Find a sub directory by its name in the given directory.
- * @param dir The directory that contains files and sub directory.
- * @param path The path of the sub directory.
- * @return The file or NULL if not found.
+ * @param parent The parent directory of the subdir that contains files and sub directory.
+ * @param dirname The name of the sub directory.
+ * @return The subdir or NULL if not found.
 */
-t_Directory	*directory_find_sub_directory(t_Directory *dir, char *path);
+t_Directory	*directory_find_subdir(t_Directory *parent, const char *dirname);
+
+/**
+ * @brief Resolve a relative path.
+ * @param root The root directory.
+ * @param path The relative path of the dir.
+ * @return The dir if it was find or NULL.
+*/
+t_Directory	*directory_resolve(t_Directory *root, const char *path);
 
 /**
  * @brief Move a sub directory to src in dst directory.
- * @param src The source directory.
  * @param dst The destination directory.
- * @param sub_dir The sub directory that will be moved.
+ * @param src The source directory.
+ * @param subdir The sub directory that will be moved.
  * @return TRUE for success or FALSE if an error occured.
 */
-bool		directory_sub_directory_move(t_Directory *src, t_Directory *dst, t_Directory *sub_dir);
+bool		directory_subdir_move(t_Directory *dst, t_Directory *src, t_Directory *subdir);
 
 /**
  * @brief Check if the directory contains a specific sub directory.
  * @param dir The directory that contains files and sub directory.
- * @param sub_dir The file.
+ * @param subdir The subdir.
  * @return TRUE for success or FALSE if an error occured.
 */
-bool		directory_contains_sub_directory(t_Directory *dir, t_Directory *sub_dir);
+bool		directory_contains_subdir(t_Directory *dir, t_Directory *subdir);
 
 #endif

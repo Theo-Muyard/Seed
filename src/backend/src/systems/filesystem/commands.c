@@ -1,5 +1,3 @@
-#include <errno.h>
-#include <string.h>
 #include "seed.h"
 #include "tools/memory.h"
 #include "systems/filesystem/system.h"
@@ -7,75 +5,43 @@
 #include "systems/filesystem/_internal.h"
 #include "systems/filesystem/_os.h"
 
-/**
- * 
-*/
-static t_Directory	*recursive_find_sub_directory(t_Directory *root, char *dirname)
-{
-	size_t		_i;
-	t_Directory	*_dir;
+// +===----- OS Errors -----===+ //
 
-	if (NULL == root || NULL == dirname)
-		return (NULL);
-	_i = 0;
-	_dir = directory_find_sub_directory(root, dirname);
-	if (NULL != _dir)
-		return (_dir);
-	while (_i < root->sub_dir_count)
-	{
-		_dir = recursive_find_sub_directory(root->sub_directory[_i], dirname);
-		if (NULL != _dir)
-			return (_dir);
-	}
-	return (NULL);
+t_ErrorCode	get_file_error(void)
+{
+	switch (errno)
+		{
+			case EEXIST:
+				return (ERR_FILE_EXIST);
+			case EACCES:
+				return (ERR_FILE_ACCESS);
+			case ENOENT:
+				return (ERR_FILE_NOT_FOUND);
+			default:
+				return (ERR_OPERATION_FAILED);
+		}
+	return (ERR_OPERATION_FAILED);
 }
 
-/**
- * 
-*/
-static t_File	*recursive_find_file(t_Directory *root, char *filename)
+t_ErrorCode	get_dir_error(void)
 {
-	size_t	_i;
-	t_File	*_file;
-
-	if (NULL == root || NULL == filename)
-		return (NULL);
-	_i = 0;
-	_file = directory_find_file(root, filename);
-	if (NULL != _file)
-		return (_file);
-	while (_i < root->sub_dir_count)
-	{
-		_file = recursive_find_file(root->sub_directory[_i], filename);
-		if (NULL != _file)
-			return (_file);
-	}
-	return (NULL);
-}
-
-static char	*get_parent_path(const char *path)
-{
-	char	*_cpy;
-	char	*_slash;
-
-	if (NULL == path)
-		return (NULL);
-	_cpy = ft_strdup(path);
-	if (NULL == _cpy)
-		return (NULL);
-	_slash = strrchr(_cpy, '/');
-	if (NULL == _slash)
-		return (free(_cpy), NULL);
-	if (_cpy == _slash)
-		_slash[1] = '\0';
-	else
-		*_slash = '\0';
-	return (_cpy);
+	switch (errno)
+		{
+			case EEXIST:
+				return (ERR_DIR_EXIST);
+			case EACCES:
+				return (ERR_DIR_ACCESS);
+			case ENOENT:
+				return (ERR_DIR_NOT_FOUND);
+			default:
+				return (ERR_OPERATION_FAILED);
+		}
+	return (ERR_OPERATION_FAILED);
 }
 
 // +===----- Directory -----===+ //
 
-t_ErrorCode	fs_directory_create(t_Manager *manager, const t_Command *cmd)
+t_ErrorCode	cmd_directory_create(t_Manager *manager, const t_Command *cmd)
 {
 	t_FileSystemCtx	*_ctx;
 	t_CmdCreateDir	*_payload;
@@ -87,18 +53,7 @@ t_ErrorCode	fs_directory_create(t_Manager *manager, const t_Command *cmd)
 	_payload = cmd->payload;
 	if (NULL == _payload->path)
 		return (ERR_INVALID_PAYLOAD);
-	if (false == os_dir_create(_payload->path, _payload->mode))
-	{
-		switch (errno)
-		{
-			case EEXIST:
-				return (ERR_DIR_EXIST);
-			case EACCES:
-				return (ERR_DIR_ACCESS);
-			default:
-				return (ERR_OPERATION_FAILED);
-		}
-	}
+	TEST_OS_DIR_ERR(os_dir_create(_payload->path, _payload->mode));
 	_tmp = get_parent_path(_payload->path);
 	_parent_dir = recursive_find_sub_directory(_ctx->root, _tmp);
 	free(_tmp);
@@ -115,7 +70,7 @@ t_ErrorCode	fs_directory_create(t_Manager *manager, const t_Command *cmd)
 	return (ERR_SUCCESS);
 }
 
-t_ErrorCode	fs_directory_delete(t_Manager *manager, const t_Command *cmd)
+t_ErrorCode	cmd_directory_delete(t_Manager *manager, const t_Command *cmd)
 {
 	t_FileSystemCtx	*_ctx;
 	t_CmdDeleteDir	*_payload;
@@ -153,7 +108,7 @@ t_ErrorCode	fs_directory_delete(t_Manager *manager, const t_Command *cmd)
 	return (ERR_SUCCESS);
 }
 
-t_ErrorCode	fs_directory_move(t_Manager *manager, const t_Command *cmd)
+t_ErrorCode	cmd_directory_move(t_Manager *manager, const t_Command *cmd)
 {
 	t_FileSystemCtx	*_ctx;
 	t_CmdMoveDir	*_payload;
@@ -197,7 +152,7 @@ t_ErrorCode	fs_directory_move(t_Manager *manager, const t_Command *cmd)
 
 // +===----- Files -----===+ //
 
-t_ErrorCode	fs_file_create(t_Manager *manager, const t_Command *cmd)
+t_ErrorCode	cmd_file_create(t_Manager *manager, const t_Command *cmd)
 {
 	t_FileSystemCtx	*_ctx;
 	t_CmdCreateFile	*_payload;
@@ -237,7 +192,7 @@ t_ErrorCode	fs_file_create(t_Manager *manager, const t_Command *cmd)
 	return (ERR_SUCCESS);
 }
 
-t_ErrorCode	fs_file_delete(t_Manager *manager, const t_Command *cmd)
+t_ErrorCode	cmd_file_delete(t_Manager *manager, const t_Command *cmd)
 {
 	t_FileSystemCtx	*_ctx;
 	t_CmdDeleteFile	*_payload;
@@ -275,7 +230,7 @@ t_ErrorCode	fs_file_delete(t_Manager *manager, const t_Command *cmd)
 	return (ERR_SUCCESS);
 }
 
-t_ErrorCode	fs_file_move(t_Manager *manager, const t_Command *cmd)
+t_ErrorCode	cmd_file_move(t_Manager *manager, const t_Command *cmd)
 {
 	t_FileSystemCtx	*_ctx;
 	t_CmdMoveFile	*_payload;
@@ -319,7 +274,7 @@ t_ErrorCode	fs_file_move(t_Manager *manager, const t_Command *cmd)
 	return (ERR_SUCCESS);
 }
 
-t_ErrorCode	fs_file_read(t_Manager *manager, const t_Command *cmd)
+t_ErrorCode	cmd_file_read(t_Manager *manager, const t_Command *cmd)
 {
 	t_FileSystemCtx	*_ctx;
 	t_CmdReadFile	*_payload;
@@ -351,7 +306,7 @@ t_ErrorCode	fs_file_read(t_Manager *manager, const t_Command *cmd)
 	return (ERR_SUCCESS);
 }
 
-t_ErrorCode	fs_file_edit_data(t_Manager *manager, const t_Command *cmd)
+t_ErrorCode	cmd_file_edit_data(t_Manager *manager, const t_Command *cmd)
 {
 	t_FileSystemCtx		*_ctx;
 	t_CmdEditDataFile	*_payload;

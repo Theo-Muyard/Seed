@@ -1,8 +1,7 @@
 #ifndef SEED_FILESYSTEM_SYSTEM_H
 # define SEED_FILESYSTEM_SYSTEM_H
 
-# include <stdbool.h>
-# include <sys/types.h>
+# include "dependency.h"
 
 // +===----- Types -----===+ //
 
@@ -15,13 +14,13 @@ typedef struct s_FileSystemCtx
 	t_Directory	*root;
 }	t_FileSystemCtx;
 
-// // +===----- Commands -----===+ //
+// +===----- Commands -----===+ //
 
 # define FS_COMMANDS_COUNT 8
 
 extern const t_CommandEntry	fs_commands[];
 
-// // +===----- Functions -----===+ //
+// +===----- Functions -----===+ //
 
 /**
  * @brief Initialize the filesystem system.

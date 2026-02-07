@@ -3,7 +3,7 @@
 
 // +===----- Path -----===+ //
 
-char		*directory_get_absolute_path(const t_Directory *dir)
+char		*directory_get_relative_path(const t_Directory *dir)
 {
 	t_Directory	*_tmp;
 	char		*path;
@@ -36,7 +36,7 @@ char		*directory_get_absolute_path(const t_Directory *dir)
 	return (path);
 }
 
-char		*file_get_absolute_path(const t_File *file)
+char		*file_get_relative_path(const t_File *file)
 {
 	char		*path;
 	char		*_tmp;
@@ -45,7 +45,7 @@ char		*file_get_absolute_path(const t_File *file)
 	size_t		_filename_len;
 
 	TEST_NULL(file, NULL);
-	path = directory_get_absolute_path(file->parent);
+	path = directory_get_relative_path(file->parent);
 	TEST_NULL(path, NULL);
 	_path_len = strlen(path);
 	_filename_len = strlen(file->filename);
@@ -256,6 +256,23 @@ bool		directory_file_move(t_Directory *dst, t_Directory *src, t_File *file)
 	return (true);
 }
 
+bool		directory_file_rename(t_File *file, const char *filename)
+{
+	char	*_old_filename;
+	char	*_new_filename;
+
+	TEST_NULL(file, false);
+	TEST_NULL(filename, false);
+	if (strcmp(filename, file->filename) == 0)
+		return (true);
+	_old_filename = file->filename;
+	_new_filename = ft_strdup(filename);
+	TEST_NULL(_new_filename, false);
+	free(_old_filename);
+	file->filename = _new_filename;
+	return (true);
+}
+
 bool		directory_contains_file(t_Directory *dir, t_File *file)
 {
 	size_t	_i;
@@ -389,6 +406,23 @@ bool		directory_subdir_move(t_Directory *dst, t_Directory *src, t_Directory *sub
 	TEST_NULL(subdir, false);
 	TEST_ERROR_FN(directory_subdir_remove(src, subdir), false);
 	TEST_ERROR_FN(directory_subdir_add(dst, subdir), false);
+	return (true);
+}
+
+bool		directory_subdir_rename(t_Directory *dir, const char *dirname)
+{
+	char	*_old_dirname;
+	char	*_new_dirname;
+
+	TEST_NULL(dir, false);
+	TEST_NULL(dirname, false);
+	if (strcmp(dirname, dir->dirname) == 0)
+		return (true);
+	_old_dirname = dir->dirname;
+	_new_dirname = ft_strdup(dirname);
+	TEST_NULL(_new_dirname, false);
+	free(_old_dirname);
+	dir->dirname = _new_dirname;
 	return (true);
 }
 

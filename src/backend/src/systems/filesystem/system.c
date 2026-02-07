@@ -11,6 +11,9 @@
 // +===----- Commands Definition -----===+ //
 
 const t_CommandEntry	fs_commands[] = {
+	{ CMD_FS_OPEN_ROOT,		sizeof(t_CmdOpenRoot),		cmd_root_open },
+	{ CMD_FS_CLOSE_ROOT,	sizeof(NULL),				cmd_root_close },
+
 	{ CMD_FS_CREATE_DIR,	sizeof(t_CmdCreateDir),		cmd_directory_create },
 	{ CMD_FS_DELETE_DIR,	sizeof(t_CmdDeleteDir),		cmd_directory_delete },
 	{ CMD_FS_MOVE_DIR,		sizeof(t_CmdMoveDir),		cmd_directory_move },
@@ -22,7 +25,7 @@ const t_CommandEntry	fs_commands[] = {
 	{ CMD_FS_EDIT_FILE,		sizeof(t_CmdEditDataFile),	cmd_file_edit_data }
 };
 
-bool	fs_init(t_Manager	*manager, char *root_dirname)
+bool	fs_init(t_Manager	*manager)
 {
 	t_FileSystemCtx		*_ctx;
 
@@ -30,18 +33,15 @@ bool	fs_init(t_Manager	*manager, char *root_dirname)
 	TEST_NULL(manager->dispatcher, false);
 	_ctx = malloc(sizeof(t_FileSystemCtx));
 	TEST_NULL(_ctx, false);
-	_ctx->root = malloc(sizeof(t_Directory));
-	TEST_NULL(_ctx->root, false);
 	if (false == register_commands(
 		manager->dispatcher,
 		fs_commands,
 		FS_COMMANDS_COUNT
 	))
 		return (free(_ctx->root), free(_ctx), false);
-	_ctx->root->dirname = ft_strdup(root_dirname);
-	_ctx->root->parent = NULL;
-	if (NULL == _ctx->root->dirname)
-		return (free(_ctx->root), free(_ctx), false);
+	_ctx->root = NULL;
+	_ctx->root_path = NULL;
+	_ctx->path_len = 0;
 	manager->fs_ctx = _ctx;
 	return (true);
 }
@@ -51,5 +51,6 @@ void	fs_clean(t_FileSystemCtx *ctx)
 	if (NULL == ctx)
 		return ;
 	directory_destroy(ctx->root);
+	free(ctx->root_path);
 	free(ctx);
 }

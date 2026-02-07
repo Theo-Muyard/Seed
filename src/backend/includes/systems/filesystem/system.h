@@ -12,28 +12,30 @@ typedef struct s_Directory		t_Directory;
 typedef struct s_FileSystemCtx
 {
 	t_Directory	*root;
+	char		*root_path;
+	size_t		path_len;
 }	t_FileSystemCtx;
 
 // +===----- Commands -----===+ //
 
-# define FS_COMMANDS_COUNT 8
+# define FS_COMMANDS_COUNT 10
 
-extern const t_CommandEntry	fs_commands[];
+// TODO: Decommenter
+// extern const t_CommandEntry	fs_commands[];
 
 // +===----- Functions -----===+ //
 
 /**
  * @brief Initialize the filesystem system.
  * @param manager The seed core manager.
- * @param root_path The root path.
  * @return TRUE for success or FALSE if an error occured.
 */
-bool	fs_init(t_Manager	*manager, char *root_path);
+bool	fs_init(t_Manager	*manager);
 
 /**
  * @brief Clean the writing system.
  * @param ctx The filesystem context.
 */
-void	fs_clean(t_Directory *ctx);
+void	fs_clean(t_FileSystemCtx *ctx);
 
 #endif

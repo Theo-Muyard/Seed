@@ -6,14 +6,16 @@
 // +===----- Macros -----===+ //
 
 /**
- * 
+ * @brief Test if the os dir function return an error and catch it
+ * @param fn The os function
 */
 # define TEST_OS_DIR_ERR(fn)	\
 	if (false == fn)	\
 		return (get_dir_error());
 
 /**
- * 
+ * @brief Test if the os file function return an error and catch it
+ * @param fn The os function
 */
 # define TEST_OS_FILE_ERR(fn)	\
 	if (false == fn)	\
@@ -22,16 +24,35 @@
 // +===----- OS Errors -----===+ //
 
 /**
- * @brief  Get the file error.
+ * @brief Get the file error.
  * @return The error.
 */
 t_ErrorCode	get_file_error(void);
 
 /**
- * @brief  Get the dir error.
+ * @brief Get the dir error.
  * @return The error.
 */
 t_ErrorCode	get_dir_error(void);
+
+// +===----- Root -----===+ //
+
+/**
+ * @brief Create a directory.
+ * @param manager The manager that will contains contexts.
+ * @param cmd The content of the command.
+ * @return An error code or SUCCESS (=0).
+*/
+t_ErrorCode	cmd_root_open(t_Manager *manager, const t_Command *cmd);
+
+/**
+ * @brief Create a directory.
+ * @param manager The manager that will contains contexts.
+ * @param cmd The content of the command.
+ * @return An error code or SUCCESS (=0).
+*/
+t_ErrorCode	cmd_root_close(t_Manager *manager, const t_Command *cmd);
+
 
 // +===----- Directory -----===+ //
 

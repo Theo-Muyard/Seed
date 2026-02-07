@@ -30,6 +30,9 @@ WRITING_SRC			=	tests/systems/writing/TEST_writing_internal.c \
 						tests/systems/writing/TEST_writing_commands.c \
 						tests/systems/writing/TEST_writing_main.c
 
+FS_SRC				=	tests/systems/filesystem/TEST_fs.c
+
+
 # | ================================================ |
 # 					OBJ FILES
 # | ================================================ |
@@ -39,6 +42,8 @@ MANAGER_OBJ			=	$(addprefix $(BUILD_DIR)/, $(notdir $(MANAGER_SRC:.c=.o)))
 DISPATCHER_OBJ		=	$(addprefix $(BUILD_DIR)/, $(notdir $(DISPATCHER_SRC:.c=.o)))
 
 WRITING_OBJ			=	$(addprefix $(BUILD_DIR)/, $(notdir $(WRITING_SRC:.c=.o)))
+
+FS_OBJ				=	$(addprefix $(BUILD_DIR)/, $(notdir $(FS_SRC:.c=.o)))
 
 # | ================================================ |
 # 					COLORS / WIDTH
@@ -96,6 +101,10 @@ writing: $(WRITING_OBJ)
 	@$(CC) $(CFLAGS) $(WRITING_OBJ) $(SEED_ARCHIVE) -o $(NAME)
 	@echo "$(GREEN)Done$(WHITE)."
 
+fs: $(FS_OBJ)
+	@$(CC) $(CFLAGS) $(FS_OBJ) $(SEED_ARCHIVE) -o $(NAME)
+	@echo "$(GREEN)Done$(WHITE)."
+
 # | ================================================ |
 # 					DIRECTORY
 # | ================================================ |
@@ -111,5 +120,6 @@ $(BUILD_DIR):
 $(foreach src, $(MANAGER_SRC), $(eval $(call COMPILE_OBJ,$(src))))
 $(foreach src, $(DISPATCHER_SRC), $(eval $(call COMPILE_OBJ,$(src))))
 $(foreach src, $(WRITING_SRC), $(eval $(call COMPILE_OBJ,$(src))))
+$(foreach src, $(FS_SRC), $(eval $(call COMPILE_OBJ,$(src))))
 
 .PHONY: all run manager dispatcher writing

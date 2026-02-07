@@ -52,7 +52,10 @@ typedef enum	e_CommandId
 	CMD_WRITING_INSERT_TEXT,
 	CMD_WRITING_DELETE_TEXT,
 
-	CMD_FS_CREATE_DIR,			// Fs
+	CMD_FS_OPEN_ROOT,			// Fs
+	CMD_FS_CLOSE_ROOT,
+
+	CMD_FS_CREATE_DIR,
 	CMD_FS_DELETE_DIR,
 	CMD_FS_MOVE_DIR,
 
@@ -136,10 +139,14 @@ typedef struct	s_CmdDeleteData
 
 // +===----- Filesystem -----===+ //
 
+typedef struct	s_CmdOpenRoot
+{
+	char	*path;
+}	t_CmdOpenRoot;
+
 typedef struct	s_CmdCreateDir
 {
-	char			*path;
-	unsigned int	mode;
+	char	*path;
 }	t_CmdCreateDir;
 
 typedef struct	s_CmdDeleteDir
@@ -155,8 +162,7 @@ typedef struct	s_CmdMoveDir
 
 typedef struct	s_CmdCreateFile
 {
-	char			*path;
-	unsigned int	mode;
+	char	*path;
 }	t_CmdCreateFile;
 
 typedef struct	s_CmdDeleteFile

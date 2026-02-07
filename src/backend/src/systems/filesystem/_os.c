@@ -24,7 +24,7 @@ bool		os_dir_delete(char *path)
 	return (true);
 }
 
-bool		os_dir_edit_path(char *old_path, char *new_path)
+bool		os_dir_move(char *old_path, char *new_path)
 {
 	if (NULL == old_path || NULL == new_path)
 		return (false);
@@ -67,7 +67,7 @@ FILE		*os_file_open(char *path, char *mode)
 	return (file);
 }
 
-bool		os_file_edit_path(char *old_path, char *new_path)
+bool		os_file_move(char *old_path, char *new_path)
 {
 	if (NULL == old_path || NULL == new_path)
 		return (false);
@@ -85,12 +85,9 @@ bool		os_file_edit_data(FILE *file, char *data)
 	return (true);
 }
 
-bool		os_file_save(FILE *file)
+void		os_file_save(FILE *file)
 {
-	if (NULL == file)
-		return (false);
 	fclose(file);
-	return (true);
 }
 
 char	*os_file_get_data(FILE *file)

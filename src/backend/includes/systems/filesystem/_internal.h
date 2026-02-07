@@ -31,18 +31,18 @@ typedef struct	s_Directory
 // +===----- Path -----===+ //
 
 /**
- * @brief Get the absolute path of a dir.
- * @param dir The dir to find his absolute path.
- * @return The absolute path.
+ * @brief Get the relative path of a dir.
+ * @param dir The dir to find his relative path.
+ * @return The relative path.
 */
-char		*directory_get_absolute_path(const t_Directory *dir);
+char		*directory_get_relative_path(const t_Directory *dir);
 
 /**
- * @brief Get the absolute path of a file.
- * @param file The file to find his absolute path.
- * @return The absolute path.
+ * @brief Get the relative path of a file.
+ * @param file The file to find his relative path.
+ * @return The relative path.
 */
-char		*file_get_absolute_path(const t_File *file);
+char		*file_get_relative_path(const t_File *file);
 
 // +===----- Directory -----===+ //
 
@@ -118,6 +118,14 @@ t_File		*file_resolve(t_Directory *root, const char *path);
 bool		directory_file_move(t_Directory *dst, t_Directory *src, t_File *file);
 
 /**
+ * @brief Rename a file.
+ * @param subdir The file that will be renamed.
+ * @param filename The new filename
+ * @return TRUE for success or FALSE if an error occured.
+*/
+bool		directory_file_rename(t_File *file, const char *filename);
+
+/**
  * @brief Check if the directory contains a specific file.
  * @param dir The directory that contains files and sub directory.
  * @param file The file.
@@ -167,6 +175,14 @@ t_Directory	*directory_resolve(t_Directory *root, const char *path);
  * @return TRUE for success or FALSE if an error occured.
 */
 bool		directory_subdir_move(t_Directory *dst, t_Directory *src, t_Directory *subdir);
+
+/**
+ * @brief Rename a sub directory.
+ * @param subdir The sub directory that will be renamed.
+ * @param dirname The new dirname
+ * @return TRUE for success or FALSE if an error occured.
+*/
+bool		directory_subdir_rename(t_Directory *dir, const char *dirname);
 
 /**
  * @brief Check if the directory contains a specific sub directory.

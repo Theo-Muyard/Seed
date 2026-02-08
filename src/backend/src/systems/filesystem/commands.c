@@ -240,6 +240,7 @@ t_ErrorCode	cmd_file_create(t_Manager *manager, const t_Command *cmd)
 	t_FileSystemCtx	*_ctx;
 	t_CmdCreateFile	*_payload;
 	t_Directory		*_parent_dir;
+	FILE			*_file;
 	char			*_filename;
 	char			*_abs_path;
 
@@ -249,10 +250,13 @@ t_ErrorCode	cmd_file_create(t_Manager *manager, const t_Command *cmd)
 	TEST_NULL(_payload->path, ERR_INVALID_PAYLOAD);
 	_abs_path = get_absolute_path(_ctx, _payload->path);
 	TEST_NULL(_abs_path, ERR_INTERNAL_MEMORY);
-	TEST_OS_DIR_ERR(os_file_create(_abs_path, "w"));
+	_file = os_file_create(_abs_path, "w");
+	if (NULL == _file)
+		return (free(_abs_path), ERR_OPERATION_FAILED);
+	os_file_save(_file);
 	_parent_dir = get_parent_directory(_ctx->root, _payload->path);
 	if (NULL == _parent_dir)
-		TEST_OS_DIR_ERR(os_file_delete(_abs_path));
+		TEST_OS_FILE_ERR(os_file_delete(_abs_path));
 	_filename = strrchr(_payload->path, '/');
 	_filename = _filename ?  _filename + 1 : _payload->path;
 	TEST_NULL(file_create(_parent_dir, _filename), ERR_INTERNAL_MEMORY);

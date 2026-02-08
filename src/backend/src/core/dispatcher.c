@@ -93,7 +93,5 @@ t_ErrorCode	dispatcher_exec(t_Manager *manager, const t_Command *cmd)
 	_cmd_entry = search_command_entry(manager->dispatcher, cmd->id);
 	if (NULL == _cmd_entry)
 		return (ERR_INVALID_COMMAND_ID);
-	if (sizeof(cmd->payload) != _cmd_entry->size)
-		return (ERR_INVALID_PAYLOAD);
 	return (_cmd_entry->fn(manager, cmd));
 }

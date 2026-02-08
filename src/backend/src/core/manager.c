@@ -19,6 +19,8 @@ t_Manager	*manager_init(void)
 		return (manager_clean(manager), NULL);
 	if (false == writing_init(manager))
 		return (manager_clean(manager), NULL);
+	if (false == fs_init(manager))
+		return (manager_clean(manager), NULL);
 	return (manager);
 }
 
@@ -28,6 +30,7 @@ void		manager_clean(t_Manager *manager)
 		return ;
 	dispatcher_clean(manager->dispatcher);
 	writing_clean(manager->writing_ctx);
+	fs_clean(manager->fs_ctx);
 	free(manager);
 }
 

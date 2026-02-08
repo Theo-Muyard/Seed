@@ -178,9 +178,9 @@ typedef struct	s_CmdMoveFile
 
 typedef struct	s_CmdReadFile
 {
-	char		*path;
-	const char	*out_data;
-	size_t		out_len;
+	char	*path;
+	char	*out_data;
+	size_t	out_len;
 }	t_CmdReadFile;
 
 typedef struct	s_CmdEditDataFile

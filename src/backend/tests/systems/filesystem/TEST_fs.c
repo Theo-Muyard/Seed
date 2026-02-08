@@ -5,6 +5,7 @@
 #include "seed.h"
 #include "core/manager.h"
 #include "core/dispatcher.h"
+#include "systems/filesystem/_internal.h"
 #include "systems/filesystem/system.h"
 #include "systems/filesystem/commands.h"
 
@@ -42,7 +43,7 @@ static int test_root_open_close(t_Manager *manager)
 
     print_section("ROOT OPEN / CLOSE");
 
-    payload.path = "/tmp/seed_fs_test";
+    payload.path = "/home/theo/Documents/Development/Seed/src/backend/tmp";
     cmd.id = CMD_FS_OPEN_ROOT;
     cmd.payload = &payload;
 
@@ -67,19 +68,17 @@ static int test_directory_and_file_lifecycle(t_Manager *manager)
     print_section("DIRECTORY & FILE LIFECYCLE");
 
     // reopen root
-    t_CmdOpenRoot open_root = { .path = "/tmp/seed_fs_test" };
+    t_CmdOpenRoot open_root = { .path = "/home/theo/Documents/Development/Seed/src/backend/tmp" };
     cmd.id = CMD_FS_OPEN_ROOT;
     cmd.payload = &open_root;
     if (manager_exec(manager, &cmd))
-        return (print_error("Failed to open root"), 1);
+		return (print_error("Failed to open root"), 1);
 
     // create dir: test/
     t_CmdCreateDir mkdir = { .path = "test" };
     cmd.id = CMD_FS_CREATE_DIR;
     cmd.payload = &mkdir;
 
-	int	_code = manager_exec(manager, &cmd);
-	printf("%d\n", _code);
     if (manager_exec(manager, &cmd))
         return (print_error("Failed to create directory"), 1);
     print_success("Directory created");
@@ -117,6 +116,7 @@ static int test_directory_and_file_lifecycle(t_Manager *manager)
     if (strcmp(read.out_data, "hello seed filesystem\n") != 0)
         return (print_error("File content mismatch"), 1);
     print_success("File content validated");
+	free(read.out_data);
 
     // move file
     t_CmdMoveFile mv = {
@@ -138,8 +138,8 @@ static int test_directory_and_file_lifecycle(t_Manager *manager)
     if (manager_exec(manager, &cmd))
         return (print_error("Failed to delete file"), 1);
     print_success("File deleted");
-
-    // delete dir
+    
+	// delete dir
     t_CmdDeleteDir rmdir = { .path = "test" };
     cmd.id = CMD_FS_DELETE_DIR;
     cmd.payload = &rmdir;
@@ -148,6 +148,12 @@ static int test_directory_and_file_lifecycle(t_Manager *manager)
         return (print_error("Failed to delete directory"), 1);
     print_success("Directory deleted");
 
+	cmd.id = CMD_FS_CLOSE_ROOT;
+    cmd.payload = NULL;
+
+    if (manager_exec(manager, &cmd))
+        return (print_error("Failed to close root"), 1);
+    print_success("Root closed");
     return (0);
 }
 
@@ -162,22 +168,13 @@ int main(void)
     printf("%s║      FILESYSTEM TEST SUITE         ║%s\n", BLUE, WHITE);
     printf("%s╚════════════════════════════════════╝%s\n", BLUE, WHITE);
 
-    manager = malloc(sizeof(t_Manager));
-    if (!manager)
-        return (1);
-
-    if (!dispatcher_init(manager, 32))
-        return (print_error("Dispatcher init failed"), 1);
-
-    fs_init(manager);
+    manager = manager_init();
 
     status |= test_root_open_close(manager);
 	if (status)
 		return (1);
     status |= test_directory_and_file_lifecycle(manager);
-
-    dispatcher_clean(manager->dispatcher);
-    free(manager);
+	manager_clean(manager);
 
     if (status == 0)
     {

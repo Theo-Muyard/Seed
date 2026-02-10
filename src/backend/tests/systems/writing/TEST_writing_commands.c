@@ -91,12 +91,6 @@ static int	test_cmd_buffer_create(void)
 	return (0);
 }
 
-/**
- * @brief Test buffer destruction through commands.
- * Verifies:
- *   - Buffer cleanup
- *   - ID reuse after deletion
-*/
 static int	test_cmd_buffer_destroy(void)
 {
 	t_Manager			*_manager;
@@ -138,13 +132,6 @@ static int	test_cmd_buffer_destroy(void)
 	return (0);
 }
 
-/**
- * @brief Test line insertion through commands.
- * Verifies:
- *   - Line creation and insertion
- *   - Index handling
- *   - Multiple line management
-*/
 static int	test_cmd_line_insert(void)
 {
 	t_Manager			*_manager;
@@ -193,12 +180,6 @@ static int	test_cmd_line_insert(void)
 	return (0);
 }
 
-/**
- * @brief Test line deletion through commands.
- * Verifies:
- *   - Line removal
- *   - Index validity
-*/
 static int	test_cmd_line_destroy(void)
 {
 	t_Manager			*_manager;
@@ -246,13 +227,6 @@ static int	test_cmd_line_destroy(void)
 	return (0);
 }
 
-/**
- * @brief Test text addition through commands.
- * Verifies:
- *   - Data insertion into lines
- *   - Column positioning
- *   - Multiple insertions
-*/
 static int	test_cmd_add_data(void)
 {
 	t_Manager			*_manager;
@@ -311,12 +285,6 @@ static int	test_cmd_add_data(void)
 	return (0);
 }
 
-/**
- * @brief Test text deletion through commands.
- * Verifies:
- *   - Data removal from lines
- *   - Proper text management
-*/
 static int	test_cmd_delete_data(void)
 {
 	t_Manager			*_manager;
@@ -360,7 +328,6 @@ static int	test_cmd_delete_data(void)
 	print_success("Text inserted: 'DELETE_THIS_PART'");
 	printf("  %sOriginal text%s: %s\n", BLUE, WHITE, _text);
 
-	// Delete first 7 characters ("DELETE_")
 	_delete_data_payload.buffer_id = _buffer_id;
 	_delete_data_payload.line = 0;
 	_delete_data_payload.column = 0;
@@ -378,12 +345,6 @@ static int	test_cmd_delete_data(void)
 	return (0);
 }
 
-/**
- * @brief Test line splitting through commands.
- * Verifies:
- *   - Line division at specified index
- *   - Content preservation and distribution
-*/
 static int	test_cmd_split_line(void)
 {
 	t_Manager			*_manager;
@@ -426,7 +387,6 @@ static int	test_cmd_split_line(void)
 
 	print_success("Text inserted: 'ABCDEFGH'");
 
-	// Split at index 4 (ABCD | EFGH)
 	_split_payload.buffer_id = _buffer_id;
 	_split_payload.line = 0;
 	_split_payload.index = 4;
@@ -444,12 +404,6 @@ static int	test_cmd_split_line(void)
 	return (0);
 }
 
-/**
- * @brief Test line joining through commands.
- * Verifies:
- *   - Consecutive line merging
- *   - Content concatenation
-*/
 static int	test_cmd_join_line(void)
 {
 	t_Manager			*_manager;

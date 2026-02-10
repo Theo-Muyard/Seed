@@ -9,6 +9,7 @@
 - [API Reference](#api-reference)
 - [Command System](#command-system)
 - [Writing System](#writing-system)
+- [FileSystem](#filesystem)
 - [Usage Examples](#usage-examples)
 - [Error Handling](#error-handling)
 
@@ -587,6 +588,71 @@ t_Command join_cmd = {
 manager_exec(manager, &join_cmd);
 // Now: Line 0 = "HelloWorld"
 ```
+
+---
+
+## FileSystem
+
+The filesystem manages files and directories, a virtual tree and soon a resync.
+
+### Command Reference
+
+#### Root Commands
+
+##### `CMD_FS_OPEN_ROOT`
+
+Open a root directory.
+
+**Payload:** `t_CmdOpenRoot`
+```c
+typedef struct	s_CmdOpenRoot
+{
+	char	*path;	/* The absolute path of the directory */
+}	t_CmdOpenRoot;
+```
+
+**Usage:**
+```c
+t_CmdOpenRoot payload = {
+	.path = absolute_path
+};
+t_Command cmd = {
+    .id = CMD_FS_OPEN_ROOT,
+    .payload = &payload
+};
+
+manager_exec(manager, &cmd);
+```
+
+---
+
+##### `CMD_FS_CLOSE_ROOT`
+
+Close a root directory.
+
+**Payload:** `NONE`
+```c
+typedef struct {
+    size_t	buffer_id;	// INPUT: The buffer to destroy
+}	t_CmdDestroyBuffer;
+```
+
+**Important:** After this command, all lines in the buffer are freed. Don't reference them afterwards.
+
+**Usage:**
+```c
+t_CmdDestroyBuffer payload = {
+    .buffer_id = buffer_id
+};
+t_Command cmd = {
+    .id = CMD_WRITING_DELETE_BUFFER,
+    .payload = &payload
+};
+
+manager_exec(manager, &cmd);
+```
+
+---
 
 ---
 

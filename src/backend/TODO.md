@@ -115,15 +115,6 @@
   - [ ] Ajouter examples pour filesystem
   - [ ] Créer migration guide depuis v0.1
 
-- 🟨 **Performance**
-  - [ ] Profiler les opérations critiques
-  - [ ] Optimiser allocations mémoire
-
-- 🟨 **Code quality**
-  - [ ] Lancer les linters
-  - [ ] Fixer les warnings
-  - [ ] Revoir les conventions de code
-
 ---
 
 ## 🚀 v0.3 - Fonctionnalités Avancées

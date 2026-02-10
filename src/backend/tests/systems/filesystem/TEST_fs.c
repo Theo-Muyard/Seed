@@ -68,7 +68,7 @@ static int test_directory_and_file_lifecycle(t_Manager *manager)
     print_section("DIRECTORY & FILE LIFECYCLE");
 
     // reopen root
-    t_CmdOpenRoot open_root = { .path = "" };
+    t_CmdOpenRoot open_root = { .path = "/home/tmuyard/Seed/src/backend/tmp" };
     cmd.id = CMD_FS_OPEN_ROOT;
     cmd.payload = &open_root;
     if (manager_exec(manager, &cmd))
@@ -93,11 +93,11 @@ static int test_directory_and_file_lifecycle(t_Manager *manager)
     print_success("File created");
 
     // write file
-    t_CmdEditDataFile edit = {
+    t_CmdWriteFile edit = {
         .path = "test/file.txt",
         .data = "hello seed filesystem\n"
     };
-    cmd.id = CMD_FS_EDIT_FILE;
+    cmd.id = CMD_FS_WRITE_FILE;
     cmd.payload = &edit;
 
     if (manager_exec(manager, &cmd))

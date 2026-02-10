@@ -2,7 +2,6 @@
 # define SEED_FILESYSTEM_OS_H
 
 # include "dependency.h"
-# include "seed.h"
 
 // +===----- OS Directory -----===+ //
 
@@ -63,12 +62,12 @@ FILE		*os_file_open(char *path, char *mode);
 bool		os_file_move(char *old_path, char *new_path);
 
 /**
- * @brief Edit a file content.
+ * @brief Write inside a file.
  * @param file The file that will be edited.
  * @param data The new data content.
  * @return TRUE for success or FALSE if an error occured.
 */
-bool		os_file_edit_data(FILE *file, char *data);
+bool		os_file_write(FILE *file, char *data);
 
 /**
  * @brief Save a file content.

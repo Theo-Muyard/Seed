@@ -1,5 +1,3 @@
-#include <stdlib.h>
-#include "core/manager.h"
 #include "core/dispatcher.h"
 #include "tools/systems.h"
 #include "systems/writing/_internal.h"
@@ -21,6 +19,8 @@ const t_CommandEntry	writing_commands[] = {
 	{ CMD_WRITING_INSERT_TEXT,		sizeof(t_CmdInsertData),	cmd_line_insert_data},
 	{ CMD_WRITING_DELETE_TEXT,		sizeof(t_CmdDeleteData),	cmd_line_delete_data}
 };
+
+// +===----- Functions -----===+ //
 
 bool	writing_init(t_Manager	*manager)
 {

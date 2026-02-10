@@ -1,9 +1,8 @@
 #ifndef SEED_DISPATCHER_H
 # define SEED_DISPATCHER_H
 
-# include <sys/types.h>
-# include <stdbool.h>
 # include "seed.h"
+# include "dependency.h"
 
 // +===----- Types -----===+ //
 
@@ -11,21 +10,20 @@ typedef struct s_Command	t_Command;
 
 typedef t_ErrorCode	(*t_Fn)(t_Manager *manager, const t_Command *cmd);
 
+/* An entry command */
 typedef struct	s_CommandEntry
 {
-	t_CommandId	id;
-	size_t		size;
-	t_Fn		fn;
+	t_CommandId	id;	/* The command ID */
+	size_t		size;	/* The size of the command */
+	t_Fn		fn;	/* The function to execute */
 }	t_CommandEntry;
 
-#define TYPE_DESC(type) \
-	(&(t_PayloadTypeDesc){.size = sizeof(type), .name = #type})
-
+/* The dispatcher */
 typedef struct s_Dispatcher
 {
-	size_t			count;
-	size_t			capacity;
-	t_CommandEntry	*commands;
+	size_t			count;	/* The count of commands registered */
+	size_t			capacity;	/* The capacity of commands */
+	t_CommandEntry	*commands;	/* The commands */
 }	t_Dispatcher;
 
 // +===----- Functions -----===+ //

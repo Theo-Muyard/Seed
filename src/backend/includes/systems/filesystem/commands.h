@@ -3,24 +3,10 @@
 
 # include "core/manager.h"
 
-// +===----- OS Errors -----===+ //
-
-/**
- * @brief Get the file error.
- * @return The error.
-*/
-t_ErrorCode	get_file_error(void);
-
-/**
- * @brief Get the dir error.
- * @return The error.
-*/
-t_ErrorCode	get_dir_error(void);
-
 // +===----- Root -----===+ //
 
 /**
- * @brief Create a directory.
+ * @brief Open the root.
  * @param manager The manager that will contains contexts.
  * @param cmd The content of the command.
  * @return An error code or SUCCESS (=0).
@@ -28,13 +14,12 @@ t_ErrorCode	get_dir_error(void);
 t_ErrorCode	cmd_root_open(t_Manager *manager, const t_Command *cmd);
 
 /**
- * @brief Create a directory.
+ * @brief Close the root.
  * @param manager The manager that will contains contexts.
  * @param cmd The content of the command.
  * @return An error code or SUCCESS (=0).
 */
 t_ErrorCode	cmd_root_close(t_Manager *manager, const t_Command *cmd);
-
 
 // +===----- Directory -----===+ //
 
@@ -97,11 +82,11 @@ t_ErrorCode	cmd_file_move(t_Manager *manager, const t_Command *cmd);
 t_ErrorCode	cmd_file_read(t_Manager *manager, const t_Command *cmd);
 
 /**
- * @brief Edit the data of a file.
+ * @brief Write inside a file.
  * @param manager The manager that will contains contexts.
  * @param cmd The content of the command.
  * @return An error code or SUCCESS (=0).
 */
-t_ErrorCode	cmd_file_edit_data(t_Manager *manager, const t_Command *cmd);
+t_ErrorCode	cmd_file_write(t_Manager *manager, const t_Command *cmd);
 
 #endif

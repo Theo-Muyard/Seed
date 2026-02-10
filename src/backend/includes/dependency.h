@@ -1,13 +1,16 @@
 #ifndef SEED_DEPENDENCY_H
 # define SEED_DEPENDENCY_H
 
-// +===----- Headers -----===+ //
+// +===----- External libraries -----===+ //
 
 # include <sys/types.h>
+# include <sys/stat.h>
+# include <fcntl.h>
+# include <errno.h>
+# include <unistd.h>
 # include <stdlib.h>
 # include <stdio.h>
 # include <stdbool.h>
-# include <errno.h>
 # include <string.h>
 
 // +===----- Macros -----===+ //

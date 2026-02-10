@@ -1,5 +1,4 @@
-#include <stdlib.h>
-#include <string.h>
+#include "dependency.h"
 #include "tools/memory.h"
 
 char	*ft_strdup(const char *str)
@@ -7,11 +6,9 @@ char	*ft_strdup(const char *str)
 	int		_i;
 	char	*ptr;
 
-	if (NULL == str)
-		return (NULL);
+	TEST_NULL(str, NULL);
 	ptr = malloc((strlen(str) + 1) * sizeof(char));
-	if (NULL == ptr)
-		return (NULL);
+	TEST_NULL(ptr, NULL);
 	_i = 0;
 	while (str[_i])
 	{
@@ -38,20 +35,20 @@ static size_t	count_words(const char *s, char c)
 	return (words);
 }
 
-static void	fill_tab(char *new, const char *s, char c)
+static void	fill_tab(char *new, const char *str, char c)
 {
 	size_t	_i;
 
 	_i = 0;
-	while (s[_i] && s[_i] != c)
+	while (str[_i] && str[_i] != c)
 	{
-		new[_i] = s[_i];
+		new[_i] = str[_i];
 		_i++;
 	}
 	new[_i] = '\0';
 }
 
-static void	set_mem(char **tab, const char *s, char c)
+static void	set_mem(char **tab, const char *str, char c)
 {
 	size_t	_count;
 	size_t	_index;
@@ -59,17 +56,17 @@ static void	set_mem(char **tab, const char *s, char c)
 
 	_index = 0;
 	_i = 0;
-	while (s[_index])
+	while (str[_index])
 	{
 		_count = 0;
-		while (s[_index + _count] && s[_index + _count] != c)
+		while (str[_index + _count] && str[_index + _count] != c)
 			_count++;
 		if (_count > 0)
 		{
 			tab[_i] = malloc(sizeof(char) * (_count + 1));
 			if (NULL == tab[_i])
 				return ;
-			fill_tab(tab[_i], (s + _index), c);
+			fill_tab(tab[_i], (str + _index), c);
 			_i++;
 			_index = _index + _count;
 		}
@@ -79,16 +76,15 @@ static void	set_mem(char **tab, const char *s, char c)
 	tab[_i] = 0;
 }
 
-char	**ft_split(const char *s, char c)
+char	**ft_split(const char *str, char c)
 {
 	size_t	_words;
 	char	**tab;
 
-	_words = count_words(s, c);
-	tab = malloc(sizeof(char *) * (_words + 1));
-	if (NULL == tab)
-		return (NULL);
-	set_mem(tab, s, c);
+	_words = count_words(str, c);
+	tab = malloc((_words + 1) * sizeof(char *));
+	TEST_NULL(tab, NULL);
+	set_mem(tab, str, c);
 	return (tab);
 }
 
@@ -96,6 +92,8 @@ void	ft_free_split(char **arr)
 {
 	size_t	_i;
 
+	if (NULL == arr)
+		return ;
 	_i = 0;
 	while (arr[_i])
 	{

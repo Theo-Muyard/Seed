@@ -1,7 +1,3 @@
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <stdlib.h>
 #include "systems/filesystem/_os.h"
 
 // +===----- OS Directory -----===+ //

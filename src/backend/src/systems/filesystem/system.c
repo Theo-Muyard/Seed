@@ -1,5 +1,3 @@
-#include "dependency.h"
-#include "core/manager.h"
 #include "core/dispatcher.h"
 #include "tools/memory.h"
 #include "tools/systems.h"
@@ -22,7 +20,7 @@ const t_CommandEntry	fs_commands[] = {
 	{ CMD_FS_DELETE_FILE,	sizeof(t_CmdDeleteFile),	cmd_file_delete },
 	{ CMD_FS_MOVE_FILE,		sizeof(t_CmdMoveFile),		cmd_file_move },
 	{ CMD_FS_READ_FILE,		sizeof(t_CmdReadFile),		cmd_file_read },
-	{ CMD_FS_EDIT_FILE,		sizeof(t_CmdEditDataFile),	cmd_file_edit_data }
+	{ CMD_FS_WRITE_FILE,	sizeof(t_CmdWriteFile),		cmd_file_write }
 };
 
 bool	fs_init(t_Manager *manager)

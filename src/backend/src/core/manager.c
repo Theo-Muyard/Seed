@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include "core/manager.h"
 #include "core/dispatcher.h"
 #include "systems/writing/system.h"
@@ -12,8 +11,7 @@ t_Manager	*manager_init(void)
 	size_t			_size;
 
 	manager = malloc(sizeof(t_Manager));
-	if (NULL == manager)
-		return (NULL);
+	TEST_NULL(manager, NULL);
 	_size = WRITING_COMMANDS_COUNT + FS_COMMANDS_COUNT;
 	if (false == dispatcher_init(manager, _size))
 		return (manager_clean(manager), NULL);
@@ -36,9 +34,7 @@ void		manager_clean(t_Manager *manager)
 
 t_ErrorCode	manager_exec(t_Manager *manager, t_Command *cmd)
 {
-	if (NULL == manager)
-		return (ERR_INVALID_MANAGER);
-	if (NULL == cmd)
-		return (ERR_INVALID_COMMAND);
+	TEST_NULL(manager, ERR_INVALID_MANAGER);
+	TEST_NULL(cmd, ERR_INVALID_COMMAND);
 	return (dispatcher_exec(manager, cmd));
 }

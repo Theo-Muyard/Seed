@@ -1,8 +1,7 @@
 #ifndef SEED_MANAGER_H
 # define SEED_MANAGER_H
 
-# include <sys/types.h>
-# include <stdbool.h>
+# include "dependency.h"
 
 // +===----- Types -----===+ //
 
@@ -12,11 +11,12 @@ typedef struct s_Dispatcher		t_Dispatcher;
 typedef struct s_WritingCtx		t_WritingCtx;
 typedef struct s_FileSystemCtx	t_FileSystemCtx;
 
+/* The seed API manager */
 typedef struct	s_Manager
 {
-	t_Dispatcher		*dispatcher;
-	t_WritingCtx		*writing_ctx;
-	t_FileSystemCtx		*fs_ctx;
+	t_Dispatcher		*dispatcher;	/* The dispatcher */
+	t_WritingCtx		*writing_ctx;	/* The writing context */
+	t_FileSystemCtx		*fs_ctx;	/* The filesysten context */
 }	t_Manager;
 
 // +===----- Functions -----===+ //

@@ -1,14 +1,18 @@
 #include "seed.h"
 #include "dependency.h"
 #include "tools/memory.h"
-#include "systems/filesystem/system.h"
-#include "systems/filesystem/commands.h"
 #include "systems/filesystem/_internal.h"
 #include "systems/filesystem/_os.h"
+#include "systems/filesystem/commands.h"
+#include "systems/filesystem/system.h"
 
 // +===----- OS Errors -----===+ //
 
-t_ErrorCode	get_file_error()
+/**
+ * @brief Get the file error.
+ * @return The error.
+*/
+static t_ErrorCode	get_file_error(void)
 {
 	switch (errno)
 		{
@@ -24,7 +28,11 @@ t_ErrorCode	get_file_error()
 	return (ERR_OPERATION_FAILED);
 }
 
-t_ErrorCode	get_dir_error()
+/**
+ * @brief Get the dir error.
+ * @return The error.
+*/
+static t_ErrorCode	get_dir_error(void)
 {
 	switch (errno)
 		{
@@ -223,9 +231,13 @@ t_ErrorCode	cmd_directory_move(t_Manager *manager, const t_Command *cmd)
 	TEST_NULL(_new_parent_dir, ERR_DIR_NOT_FOUND);
 	_slash = strrchr(_payload->new_path, '/');
 	if (NULL == _slash)
+	{
 		TEST_ERROR_FN(directory_subdir_rename(_dir, _payload->new_path), ERR_INTERNAL_MEMORY);
+	}
 	else
+	{
 		TEST_ERROR_FN(directory_subdir_rename(_dir, _slash + 1), ERR_INTERNAL_MEMORY);
+	}
 	TEST_ERROR_FN(
 		directory_subdir_move(_new_parent_dir, _dir->parent, _dir),
 		ERR_OPERATION_FAILED
@@ -256,11 +268,14 @@ t_ErrorCode	cmd_file_create(t_Manager *manager, const t_Command *cmd)
 	os_file_save(_file);
 	_parent_dir = get_parent_directory(_ctx->root, _payload->path);
 	if (NULL == _parent_dir)
-		TEST_OS_FILE_ERR(os_file_delete(_abs_path));
+	{
+		if (false == os_file_delete(_abs_path))
+			return (free(_abs_path), get_file_error());
+	}
+	free(_abs_path);
 	_filename = strrchr(_payload->path, '/');
 	_filename = _filename ?  _filename + 1 : _payload->path;
 	TEST_NULL(file_create(_parent_dir, _filename), ERR_INTERNAL_MEMORY);
-	free(_abs_path);
 	return (ERR_SUCCESS);
 }
 
@@ -319,9 +334,13 @@ t_ErrorCode	cmd_file_move(t_Manager *manager, const t_Command *cmd)
 	TEST_NULL(_new_parent_dir, ERR_DIR_NOT_FOUND);
 	_slash = strrchr(_payload->new_path, '/'); 
 	if (NULL == _slash)
+	{
 		TEST_ERROR_FN(directory_file_rename(_file, _payload->new_path), ERR_INTERNAL_MEMORY);
+	}
 	else
+	{
 		TEST_ERROR_FN(directory_file_rename(_file, _slash + 1), ERR_INTERNAL_MEMORY);
+	}
 
 	TEST_ERROR_FN(
 		directory_file_move(_new_parent_dir, _file->parent, _file),
@@ -357,10 +376,10 @@ t_ErrorCode	cmd_file_read(t_Manager *manager, const t_Command *cmd)
 	return (ERR_SUCCESS);
 }
 
-t_ErrorCode	cmd_file_edit_data(t_Manager *manager, const t_Command *cmd)
+t_ErrorCode	cmd_file_write(t_Manager *manager, const t_Command *cmd)
 {
 	t_FileSystemCtx		*_ctx;
-	t_CmdEditDataFile	*_payload;
+	t_CmdWriteFile		*_payload;
 	FILE				*_file;
 	char				*_abs_path;
 
@@ -375,7 +394,7 @@ t_ErrorCode	cmd_file_edit_data(t_Manager *manager, const t_Command *cmd)
 	free(_abs_path);
 	if (NULL == _file)
 		return (ERR_OPERATION_FAILED);
-	if (false == os_file_edit_data(_file, _payload->data))
+	if (false == os_file_write(_file, _payload->data))
 		return (os_file_save(_file), ERR_OPERATION_FAILED);
 	os_file_save(_file);
 	return (ERR_SUCCESS);

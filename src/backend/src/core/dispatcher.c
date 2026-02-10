@@ -32,8 +32,7 @@ bool	dispatcher_init(t_Manager *manager, size_t capacity)
 	t_Dispatcher	*_dispatcher;
 
 	_dispatcher = malloc(sizeof(t_Dispatcher));
-	if (NULL == _dispatcher)
-		return (false);
+	TEST_NULL(_dispatcher, false);
 	_dispatcher->count = 0;
 	_dispatcher->capacity = capacity;
 	_dispatcher->commands = malloc(capacity * sizeof(t_CommandEntry));
@@ -64,10 +63,9 @@ bool	dispatcher_register(
 	t_CommandEntry	_entry;
 	size_t			_count;
 
-	if (NULL == dispatcher || NULL == fn)
-		return (false);
-	if (NULL == dispatcher->commands)
-		return (false);
+	TEST_NULL(dispatcher, false);
+	TEST_NULL(fn, false);
+	TEST_NULL(dispatcher->commands, false);
 	_count = dispatcher->count;
 	if (_count >= dispatcher->capacity)
 		return (false);
@@ -83,15 +81,11 @@ t_ErrorCode	dispatcher_exec(t_Manager *manager, const t_Command *cmd)
 {
 	t_CommandEntry	*_cmd_entry;
 
-	if (NULL == manager)
-		return (ERR_INVALID_MANAGER);
-	if (NULL == cmd)
-		return (ERR_INVALID_COMMAND);
-	if (NULL == manager->dispatcher)
-		return (ERR_DISPATCHER_NOT_INITIALIZED);
+	TEST_NULL(manager, ERR_INVALID_MANAGER);
+	TEST_NULL(cmd, ERR_INVALID_COMMAND);
+	TEST_NULL(manager->dispatcher, ERR_DISPATCHER_NOT_INITIALIZED);
 
 	_cmd_entry = search_command_entry(manager->dispatcher, cmd->id);
-	if (NULL == _cmd_entry)
-		return (ERR_INVALID_COMMAND_ID);
+	TEST_NULL(_cmd_entry, ERR_INVALID_COMMAND_ID);
 	return (_cmd_entry->fn(manager, cmd));
 }

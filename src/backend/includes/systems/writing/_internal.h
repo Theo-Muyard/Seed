@@ -1,24 +1,25 @@
 #ifndef SEED_WRITING_INTERNAL_H
 # define SEED_WRITING_INTERNAL_H
 
-# include <sys/types.h>
-# include <stdbool.h>
+# include "dependency.h"
 
 // +===----- Types -----===+ //
 
+/* A line in writing system */
 typedef struct	s_Line
 {
-	char			*data;
-	size_t			len;
-	size_t			capacity;
-	struct s_Line	*prev;
-	struct s_Line	*next;
+	char			*data;	/* The data content */
+	size_t			len;	/* The data len content */
+	size_t			capacity;	/* The data capacity */
+	struct s_Line	*prev;	/* The previous line */
+	struct s_Line	*next; 	/* The next line */
 }	t_Line;
 
+/* A buffer in writing system */
 typedef struct	s_Buffer
 {
-	t_Line	*line;
-	size_t	size;
+	t_Line	*line;	/* The  first line */
+	size_t	size;	/* The count of lines */
 }	t_Buffer;
 
 // +===----- Buffer -----===+ //

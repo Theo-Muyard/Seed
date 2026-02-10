@@ -79,38 +79,22 @@
 
 **Impact:** Persistance, import/export, intégration système
 
-- ⬜ **Spécifier l'API de fichiers**
+- ✅ **Spécifier l'API de fichiers**
   - [x] Créer les headers `includes/systems/filesystem`
-  - [ ] Définir les opérations : create, delete, open, save, edit_path, edit_data
-  - [ ] Supporter les chemins absolus
+  - [x] Définir les opérations : open, close, create, delete, move, save, read, write
 
-- ⬜ **Opération : Ouvrir un fichier**
-  - [ ] `filesystem_open()` → file_handle
-  - [ ] Charger dans un nouveau buffer
-  - [ ] Détecter l'encodage automatiquement
-  - [ ] Retourner erreur si fichier inexistant
-  - [ ] Mapping fichier ↔ buffer_id pour tracking
 
-- ⬜ **Opération : Sauvegarder un buffer**
-  - [ ] `filesystem_save()` → erreur ou succès
-  - [ ] Supporter overwrite/no-overwrite
-  - [ ] Créer le répertoire parent si besoin
-  - [ ] Atomic write (écrire dans temp, puis rename)
-  - [ ] Préserver permissions/timestamps optionnels
+- ✅ **Intégration avec le Manager**
+  - [x] Ajouter les commandes filesystem au dispatcher
+  - [x] Ajouter les commandes au header + handle erreurs
 
-- ⬜ **Intégration avec le Manager**
-  - [ ] Ajouter les commandes filesystem au dispatcher
-  - [ ] Mapping persistent des fichiers ouverts
-  - [ ] Gestion des buffers < → > fichiers
+- ✅ **Gestion des erreurs fichiers**
+  - [x] Permissions insuffisantes
+  - [x] Fichier verrouillé (par autre processus)
+  - [x] Encodage invalide
+  - [x] Chemin invalide
 
-- ⬜ **Gestion des erreurs fichiers**
-  - [ ] Permissions insuffisantes
-  - [ ] Disque plein
-  - [ ] Fichier verrouillé (par autre processus)
-  - [ ] Encodage invalide
-  - [ ] Chemin invalide
-
-- ⬜ **Bonus : Watch des fichiers**
+- ⚠️ **Bonus : Watch des fichiers**
   - [ ] Détecter si fichier modifié par processus externe
   - [ ] Proposer reload ou merge
   - [ ] Optionnel pour v0.2.5?
@@ -274,9 +258,9 @@ v0.2 (Fondations: Erreurs, Validation, FS)
 ## 📝 Notes de Développement
 
 ### Conventions Décidées
-- [ ] Préfixes à utiliser: `seed_`, `manager_`, `dispatcher_`, etc
-- [ ] Codes erreur: enum vs defines?
-- [ ] Structure retour d'erreur: struct vs out param?
+- [x] Préfixes à utiliser: `seed_`, `manager_`, `dispatcher_`, etc
+- [x] Codes erreur: enum vs defines?
+- [x] Structure retour d'erreur: struct vs out param?
 - [ ] Max payload size: À décider
 
 ### Considérations Architecturales

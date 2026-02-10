@@ -2,26 +2,26 @@
 # define SEED_FILESYSTEM_SYSTEM_H
 
 # include "dependency.h"
+# include "core/dispatcher.h"
 
 // +===----- Types -----===+ //
 
-typedef struct s_CommandEntry	t_CommandEntry;
 typedef struct s_Manager		t_Manager;
 typedef struct s_Directory		t_Directory;
 
+/* The filesystem of the seed core */
 typedef struct s_FileSystemCtx
 {
-	t_Directory	*root;
-	char		*root_path;
-	size_t		path_len;
+	t_Directory	*root;	/* The root directory */
+	char		*root_path;	/* The absolute root path directory */
+	size_t		path_len;	/* The length of the root path */
 }	t_FileSystemCtx;
 
 // +===----- Commands -----===+ //
 
 # define FS_COMMANDS_COUNT 10
 
-// TODO: Decommenter
-// extern const t_CommandEntry	fs_commands[];
+extern const t_CommandEntry	fs_commands[];
 
 // +===----- Functions -----===+ //
 

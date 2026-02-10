@@ -8,24 +8,26 @@
 
 // +===----- Types -----===+ //
 
+/* A file in the filesystem */
 typedef struct	s_File
 {
-	char				*filename;
-	struct s_Directory	*parent;
+	char				*filename;	/* The filename */
+	struct s_Directory	*parent;	/* The parent directory */
 }	t_File;
 
+/* A directory in the filesystem */
 typedef struct	s_Directory
 {
-	char				*dirname;
-	struct s_Directory	*parent;
+	char				*dirname;	/* The dirname */
+	struct s_Directory	*parent;	/* The parent directory */
 
-	t_File				**files;
-	size_t				files_count;
-	size_t				files_capacity;
+	t_File				**files;	/* The files his contains */
+	size_t				files_count;	/* The files count */
+	size_t				files_capacity;	/* The file capacity */
 
-	struct s_Directory	**subdir;
-	size_t				subdir_count;
-	size_t				subdir_capacity;
+	struct s_Directory	**subdir;	/* The subdir his contains */
+	size_t				subdir_count;	/* The subdir count */
+	size_t				subdir_capacity;	/* The subdir capacity */
 }	t_Directory;
 
 // +===----- Path -----===+ //

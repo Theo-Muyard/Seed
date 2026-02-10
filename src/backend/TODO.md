@@ -103,24 +103,23 @@
 
 ### 5️⃣ Amélioration Générale
 
-- ⬜ **Couverture de tests**
+- 🟨 **Couverture de tests**
   - [ ] Viser >80% de couverture
   - [ ] Tests pour tous les codes erreur
   - [ ] Tests limites et edge cases
   - [ ] Intégration tests (multi-système)
 
-- ⬜ **Documentation**
+- 🟨 **Documentation**
   - [ ] Mettre à jour README avec v0.2 changes
   - [ ] Documenter les codes erreur
   - [ ] Ajouter examples pour filesystem
   - [ ] Créer migration guide depuis v0.1
 
-- ⬜ **Performance**
+- 🟨 **Performance**
   - [ ] Profiler les opérations critiques
   - [ ] Optimiser allocations mémoire
-  - [ ] Benchmark vs baseline v0.1
 
-- ⬜ **Code quality**
+- 🟨 **Code quality**
   - [ ] Lancer les linters
   - [ ] Fixer les warnings
   - [ ] Revoir les conventions de code
@@ -131,39 +130,18 @@
 
 > Après v0.2 stable | Nouvelles capabilities
 
-### Features à explorer
-
 - ⬜ **Undo/Redo System**
   - [ ] Stack d'opérations
   - [ ] Replay d'opérations
   - [ ] Limite de profondeur (configurable)
 
-- ⬜ **Encodage multi-format**
-  - [ ] UTF-8, UTF-16, Latin-1, etc
-  - [ ] Détection automatique + override manuel
-  - [ ] Conversion transparent
+- ⬜ **Encodage unicode**
+  - [ ] Passer d'ASCII a UNICODE : writing system
+  - [ ] Line: passage de len -> size
+  - [ ] Conversion index -> emplacement de l'unicode dans le tableau data
 
-- ⬜ **Selection & Range**
-  - [ ] Notion de selection dans buffer
-  - [ ] Operations sur ranges (copy, delete, format)
-  - [ ] Multi-selection?
-
-- ⬜ **Search & Replace**
-  - [ ] Find in buffer
-  - [ ] Replace with validation
-  - [ ] Regex support (optionnel)
-  - [ ] Find in all files (filesystem)
-
-- ⬜ **Diff & Merge**
-  - [ ] Comparer deux buffers
-  - [ ] Générer diffs
-  - [ ] Merge strategies
-
-- ⬜ **Collaboration (RTC)**
-  - [ ] Operational Transforms?
-  - [ ] CRDT?
-  - [ ] Multi-client support
-  - [ ] Conflict resolution
+- ⬜ **Resync fs**
+  - [ ] Resync le VFS via les events OS (linux only)
 
 ---
 

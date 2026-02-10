@@ -177,8 +177,6 @@ static int	test_cmd_line_insert(void)
 
 	// Insert line at end
 	_insert_payload.line = -1;
-	t_ErrorCode code = cmd_buffer_line_insert(_manager, &_cmd);
-	printf("%d\n", code);
 	if (cmd_buffer_line_insert(_manager, &_cmd))
 		return (print_error("Failed to insert second line"), 1);
 	print_success("Line #2 inserted (appended to end)");

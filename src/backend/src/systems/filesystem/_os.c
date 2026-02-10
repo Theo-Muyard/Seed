@@ -72,7 +72,7 @@ bool		os_file_move(char *old_path, char *new_path)
 	return (true);
 }
 
-bool		os_file_edit_data(FILE *file, char *data)
+bool		os_file_write(FILE *file, char *data)
 {
 	if (NULL == file || NULL == data)
 		return (false);

@@ -26,6 +26,7 @@ void		manager_clean(t_Manager *manager)
 {
 	if (NULL == manager)
 		return ;
+
 	dispatcher_clean(manager->dispatcher);
 	writing_clean(manager->writing_ctx);
 	fs_clean(manager->fs_ctx);

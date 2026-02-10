@@ -1,35 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include "tools.h"
 #include "core/manager.h"
 #include "core/dispatcher.h"
 #include "systems/writing/system.h"
 #include "systems/writing/_internal.h"
 #include "systems/writing/commands.h"
-
-// +===----- Colors -----===+ //
-
-#define RED		"\033[31m"
-#define GREEN	"\033[32m"
-#define YELLOW	"\033[33m"
-#define BLUE	"\033[34m"
-#define WHITE	"\033[37m"
-
-// +===----- Test Utilities -----===+ //
-
-static void	print_section(const char *section)
-{
-	printf("\n%s=== %s ===%s\n", BLUE, section, WHITE);
-}
-
-static void	print_success(const char *message)
-{
-	printf("%s✓ %s%s\n", GREEN, message, WHITE);
-}
-
-static void	print_error(const char *message)
-{
-	printf("%s✗ %s%s\n", RED, message, WHITE);
-}
 
 // +===----- Test Cases -----===+ //
 
@@ -45,19 +19,23 @@ static int	test_manager_init(void)
 	print_success("Manager allocated successfully");
 
 	if (NULL == _manager->dispatcher)
-		return (print_error("Dispatcher not initialized"), 1);
+		return (manager_clean(_manager), print_error("Dispatcher not initialized"), 1);
 	print_success("Dispatcher initialized");
 
 	if (NULL == _manager->writing_ctx)
-		return (print_error("Writing context not initialized"), 1);
+		return (manager_clean(_manager), print_error("Writing context not initialized"), 1);
 	print_success("Writing context initialized");
+
+	if (NULL == _manager->fs_ctx)
+		return (manager_clean(_manager), print_error("Filesystem context not initialized"), 1);
+	print_success("Filesystem context initialized");
 
 	printf("  %sDispatcher capacity%s: %zu commands\n", BLUE, WHITE, _manager->dispatcher->capacity);
 	printf("  %sDispatcher count%s: %zu commands registered\n", BLUE, WHITE, _manager->dispatcher->count);
 
-	if (_manager->dispatcher->count != 9)
-		return (print_error("Expected 9 writing commands to be registered"), 1);
-	print_success("All 9 writing commands registered");
+	if (_manager->dispatcher->count != 19)
+		return (print_error("Expected 19 writing commands to be registered"), 1);
+	print_success("All 19 writing commands registered");
 
 	manager_clean(_manager);
 	return (0);
@@ -83,7 +61,7 @@ static int	test_manager_buffers(void)
 	_cmd.payload = &_payload;
 	
 	if (manager_exec(_manager, &_cmd))
-		return (print_error("Failed to execute create buffer command"), 1);
+		return (manager_clean(_manager), print_error("Failed to execute create buffer command"), 1);
 	print_success("Buffer creation command executed");
 
 	_id1 = _payload.out_buffer_id;
@@ -93,14 +71,14 @@ static int	test_manager_buffers(void)
 	_cmd.payload = &_payload2;
 
 	if (manager_exec(_manager, &_cmd))
-		return (print_error("Failed to create second buffer"), 1);
+		return (manager_clean(_manager), print_error("Failed to create second buffer"), 1);
 	print_success("Second buffer created");
 
 	_id2 = _payload2.out_buffer_id;
 	printf("  %sSecond buffer ID%s: %zu\n", BLUE, WHITE, _id2);
 
 	if (_id1 == _id2)
-		return (print_error("Buffer IDs should be different"), 1);
+		return (manager_clean(_manager), print_error("Buffer IDs should be different"), 1);
 	print_success("Buffer IDs are unique");
 
 	manager_clean(_manager);
@@ -123,14 +101,14 @@ static int	test_manager_lines_and_text(void)
 
 	_manager = manager_init();
 	if (NULL == _manager)
-		return (print_error("Failed to initialize manager"), 1);
+		return (manager_clean(_manager), print_error("Failed to initialize manager"), 1);
 
 	_create_payload.out_buffer_id = 0;
 	_cmd.id = CMD_WRITING_CREATE_BUFFER;
 	_cmd.payload = &_create_payload;
 	
 	if (manager_exec(_manager, &_cmd))
-		return (print_error("Failed to create buffer"), 1);
+		return (manager_clean(_manager), print_error("Failed to create buffer"), 1);
 
 	_buffer_id = _create_payload.out_buffer_id;
 
@@ -139,7 +117,7 @@ static int	test_manager_lines_and_text(void)
 	_cmd.id = CMD_WRITING_INSERT_LINE;
 	_cmd.payload = &_insert_line_payload;
 	if (manager_exec(_manager, &_cmd))
-		return (print_error("Failed to insert line"), 1);
+		return (manager_clean(_manager), print_error("Failed to insert line"), 1);
 	print_success("Line created in buffer");
 
 	_add_data_payload.buffer_id = _buffer_id;
@@ -151,7 +129,7 @@ static int	test_manager_lines_and_text(void)
 	_cmd.id = CMD_WRITING_INSERT_TEXT;
 	_cmd.payload = &_add_data_payload;
 	if (manager_exec(_manager, &_cmd))
-		return (print_error("Failed to insert text"), 1);
+		return (manager_clean(_manager), print_error("Failed to insert text"), 1);
 	print_success("Text inserted: 'Hello World'");
 
 	printf("  %sLine content%s: %s\n", BLUE, WHITE, _text);
@@ -164,7 +142,7 @@ static int	test_manager_lines_and_text(void)
 	_cmd.id = CMD_WRITING_DELETE_TEXT;
 	_cmd.payload = &_delete_data_payload;
 	if (manager_exec(_manager, &_cmd))
-		return (print_error("Failed to delete text"), 1);
+		return (manager_clean(_manager), print_error("Failed to delete text"), 1);
 	print_success("Text deleted");
 
 	printf("  %sResult%s: World\n", BLUE, WHITE);
@@ -232,7 +210,7 @@ static int	test_manager_split_join(void)
 	_cmd.id = CMD_WRITING_SPLIT_LINE;
 	_cmd.payload = &_split_payload;
 	if (manager_exec(_manager, &_cmd))
-		return (print_error("Failed to split line"), 1);
+		return (manager_clean(_manager), print_error("Failed to split line"), 1);
 	print_success("Line split at index 4");
 
 	printf("  %sResult: ABCD | EFGH%s\n", BLUE, WHITE);
@@ -244,7 +222,7 @@ static int	test_manager_split_join(void)
 	_cmd.id = CMD_WRITING_JOIN_LINE;
 	_cmd.payload = &_join_payload;
 	if (manager_exec(_manager, &_cmd))
-		return (print_error("Failed to join lines"), 1);
+		return (manager_clean(_manager), print_error("Failed to join lines"), 1);
 	print_success("Lines joined successfully");
 
 	manager_clean(_manager);
@@ -265,19 +243,6 @@ int	main(void)
 	_status |= test_manager_lines_and_text();
 	_status |= test_manager_split_join();
 
-	if (0 == _status)
-	{
-		printf("\n%s╔════════════════════════════════════╗%s\n", GREEN, WHITE);
-		printf("%s║         ALL TESTS PASSED ✓         ║%s\n", GREEN, WHITE);
-		printf("%s╚════════════════════════════════════╝%s\n", GREEN, WHITE);
-	}
-	else
-	{
-		printf("\n%s╔════════════════════════════════════╗%s\n", RED, WHITE);
-		printf("%s║         SOME TESTS FAILED ✗        ║%s\n", RED, WHITE);
-		printf("%s╚════════════════════════════════════╝%s\n", RED, WHITE);
-	}
-
-	printf("\n");
+	print_status(_status);
 	return (_status);
 }

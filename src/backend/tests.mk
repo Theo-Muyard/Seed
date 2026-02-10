@@ -16,11 +16,13 @@ CFLAGS				=	-Wall -Wextra -Werror
 # | ================================================ |
 # 					INCLUDES
 # | ================================================ |
-INCLUDES			=	-I includes -I includes/systems
+INCLUDES			=	-I includes -I tests
 
 # | ================================================ |
 # 					SOURCE FILES
 # | ================================================ |
+
+TESTS_SRC			=	tests/tools.c
 
 MANAGER_SRC			=	tests/core/TEST_manager.c
 
@@ -36,6 +38,8 @@ FS_SRC				=	tests/systems/filesystem/TEST_fs.c
 # | ================================================ |
 # 					OBJ FILES
 # | ================================================ |
+
+TEST_OBJ			=	$(addprefix $(BUILD_DIR)/, $(notdir $(TESTS_SRC:.c=.o)))
 
 MANAGER_OBJ			=	$(addprefix $(BUILD_DIR)/, $(notdir $(MANAGER_SRC:.c=.o)))
 
@@ -54,12 +58,6 @@ RED			=	\033[31m
 GREEN		=	\033[32m
 BLUE		=	\033[34m
 WHITE		=	\033[37m
-
-# | ================================================ |
-# 					TEST FUNCTION
-# | ================================================ |
-
-# No macro needed, just direct rules
 
 # | ================================================ |
 # 					COMPILE FUNCTION
@@ -89,20 +87,20 @@ run:
 # 					TEST TARGETS
 # | ================================================ |
 
-manager: $(MANAGER_OBJ)
-	@$(CC) $(CFLAGS) $(MANAGER_OBJ) $(SEED_ARCHIVE) -o $(NAME)
+manager: $(TEST_OBJ) $(MANAGER_OBJ)
+	@$(CC) $(CFLAGS) $(TEST_OBJ) $(MANAGER_OBJ) $(SEED_ARCHIVE) -o $(NAME)
 	@echo "$(GREEN)Done$(WHITE)."
 
-dispatcher: $(DISPATCHER_OBJ)
-	@$(CC) $(CFLAGS) $(DISPATCHER_OBJ) $(SEED_ARCHIVE) -o $(NAME)
+dispatcher: $(TEST_OBJ) $(DISPATCHER_OBJ)
+	@$(CC) $(CFLAGS) $(TEST_OBJ) $(DISPATCHER_OBJ) $(SEED_ARCHIVE) -o $(NAME)
 	@echo "$(GREEN)Done$(WHITE)."
 
-writing: $(WRITING_OBJ)
-	@$(CC) $(CFLAGS) $(WRITING_OBJ) $(SEED_ARCHIVE) -o $(NAME)
+writing: $(TEST_OBJ) $(WRITING_OBJ)
+	@$(CC) $(CFLAGS) $(TEST_OBJ) $(WRITING_OBJ) $(SEED_ARCHIVE) -o $(NAME)
 	@echo "$(GREEN)Done$(WHITE)."
 
-fs: $(FS_OBJ)
-	@$(CC) $(CFLAGS) $(FS_OBJ) $(SEED_ARCHIVE) -o $(NAME)
+fs: $(TEST_OBJ) $(FS_OBJ)
+	@$(CC) $(CFLAGS) $(TEST_OBJ) $(FS_OBJ) $(SEED_ARCHIVE) -o $(NAME)
 	@echo "$(GREEN)Done$(WHITE)."
 
 # | ================================================ |
@@ -117,6 +115,7 @@ $(BUILD_DIR):
 # 					OBJECTS
 # | ================================================ |
 
+$(foreach src, $(TESTS_SRC), $(eval $(call COMPILE_OBJ,$(src))))
 $(foreach src, $(MANAGER_SRC), $(eval $(call COMPILE_OBJ,$(src))))
 $(foreach src, $(DISPATCHER_SRC), $(eval $(call COMPILE_OBJ,$(src))))
 $(foreach src, $(WRITING_SRC), $(eval $(call COMPILE_OBJ,$(src))))

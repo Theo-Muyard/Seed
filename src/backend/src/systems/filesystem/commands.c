@@ -8,7 +8,7 @@
 
 // +===----- OS Errors -----===+ //
 
-t_ErrorCode	get_file_error(void)
+t_ErrorCode	get_file_error()
 {
 	switch (errno)
 		{
@@ -24,7 +24,7 @@ t_ErrorCode	get_file_error(void)
 	return (ERR_OPERATION_FAILED);
 }
 
-t_ErrorCode	get_dir_error(void)
+t_ErrorCode	get_dir_error()
 {
 	switch (errno)
 		{
@@ -153,14 +153,18 @@ t_ErrorCode	cmd_directory_create(t_Manager *manager, const t_Command *cmd)
 	TEST_NULL(_payload->path, ERR_INVALID_PAYLOAD);
 	_abs_path = get_absolute_path(_ctx, _payload->path);
 	TEST_NULL(_abs_path, ERR_INTERNAL_MEMORY);
-	TEST_OS_DIR_ERR(os_dir_create(_abs_path, 0755));
+	if (false == os_dir_create(_abs_path, 0755))
+		return (free(_abs_path), get_dir_error());
 	_parent_dir = get_parent_directory(_ctx->root, _payload->path);
 	if (NULL == _parent_dir)
-		TEST_OS_DIR_ERR(os_dir_delete(_abs_path));
+	{
+		if (false == os_dir_delete(_abs_path))
+			return (free(_abs_path), get_dir_error());
+	}
+	free(_abs_path);
 	_dirname = strrchr(_payload->path, '/');
 	_dirname = _dirname ?  _dirname + 1 : _payload->path;
 	TEST_NULL(directory_create(_parent_dir, _dirname), ERR_INTERNAL_MEMORY);
-	free(_abs_path);
 	return (ERR_SUCCESS);
 }
 
@@ -177,7 +181,9 @@ t_ErrorCode	cmd_directory_delete(t_Manager *manager, const t_Command *cmd)
 	TEST_NULL(_payload->path, ERR_INVALID_PAYLOAD);
 	_abs_path = get_absolute_path(_ctx, _payload->path);
 	TEST_NULL(_abs_path, ERR_INTERNAL_MEMORY);
-	TEST_OS_DIR_ERR(os_dir_delete(_abs_path));
+	if (false == os_dir_delete(_abs_path))
+		return (free(_abs_path), get_dir_error());
+	free(_abs_path);
 	_dir = directory_resolve(_ctx->root, _payload->path);
 	TEST_NULL(_dir, ERR_SUCCESS);
 	TEST_ERROR_FN(
@@ -185,7 +191,6 @@ t_ErrorCode	cmd_directory_delete(t_Manager *manager, const t_Command *cmd)
 		ERR_OPERATION_FAILED
 	);
 	directory_destroy(_dir);
-	free(_abs_path);
 	return (ERR_SUCCESS);
 }
 
@@ -208,28 +213,23 @@ t_ErrorCode	cmd_directory_move(t_Manager *manager, const t_Command *cmd)
 	_new_abs_path = get_absolute_path(_ctx, _payload->new_path);
 	TEST_NULL(_old_abs_path, ERR_OPERATION_FAILED);
 	TEST_NULL(_new_abs_path, ERR_OPERATION_FAILED);
-	TEST_OS_DIR_ERR(os_dir_move(_old_abs_path, _new_abs_path));
+	if (false == os_dir_move(_old_abs_path, _new_abs_path))
+		return (free(_old_abs_path), free(_new_abs_path), get_dir_error());
+	free(_old_abs_path);
+	free(_new_abs_path);
 	_dir = directory_resolve(_ctx->root, _payload->old_path);
 	_new_parent_dir = get_parent_directory(_ctx->root, _payload->new_path);
 	TEST_NULL(_dir, ERR_DIR_NOT_FOUND);
 	TEST_NULL(_new_parent_dir, ERR_DIR_NOT_FOUND);
 	_slash = strrchr(_payload->new_path, '/');
 	if (NULL == _slash)
-	{
-		if (false == directory_subdir_rename(_dir, _payload->new_path))
-			return (free(_old_abs_path), free(_new_abs_path), ERR_INTERNAL_MEMORY);
-	}
+		TEST_ERROR_FN(directory_subdir_rename(_dir, _payload->new_path), ERR_INTERNAL_MEMORY);
 	else
-	{
-		if (false == directory_subdir_rename(_dir, _slash + 1))
-			return (free(_old_abs_path), free(_new_abs_path), ERR_INTERNAL_MEMORY);
-	}
+		TEST_ERROR_FN(directory_subdir_rename(_dir, _slash + 1), ERR_INTERNAL_MEMORY);
 	TEST_ERROR_FN(
 		directory_subdir_move(_new_parent_dir, _dir->parent, _dir),
 		ERR_OPERATION_FAILED
 	);
-	free(_old_abs_path);
-	free(_new_abs_path);
 	return (ERR_SUCCESS);
 }
 
@@ -277,7 +277,9 @@ t_ErrorCode	cmd_file_delete(t_Manager *manager, const t_Command *cmd)
 	TEST_NULL(_payload->path, ERR_INVALID_PAYLOAD);
 	_abs_path = get_absolute_path(_ctx, _payload->path);
 	TEST_NULL(_abs_path, ERR_INTERNAL_MEMORY);
-	TEST_OS_DIR_ERR(os_file_delete(_abs_path));
+	if (false == os_file_delete(_abs_path))
+		return (free(_abs_path), get_file_error());
+	free(_abs_path);
 	_file = file_resolve(_ctx->root, _payload->path);
 	TEST_NULL(_file, ERR_SUCCESS);
 	TEST_ERROR_FN(
@@ -285,7 +287,6 @@ t_ErrorCode	cmd_file_delete(t_Manager *manager, const t_Command *cmd)
 		ERR_OPERATION_FAILED
 	);
 	file_destroy(_file);
-	free(_abs_path);
 	return (ERR_SUCCESS);
 }
 
@@ -308,28 +309,24 @@ t_ErrorCode	cmd_file_move(t_Manager *manager, const t_Command *cmd)
 	_new_abs_path = get_absolute_path(_ctx, _payload->new_path);
 	TEST_NULL(_old_abs_path, ERR_OPERATION_FAILED);
 	TEST_NULL(_new_abs_path, ERR_OPERATION_FAILED);
-	TEST_OS_DIR_ERR(os_file_move(_old_abs_path, _new_abs_path));
+	if (false == os_file_move(_old_abs_path, _new_abs_path))
+		return (free(_old_abs_path), free(_new_abs_path), get_file_error());
+	free(_old_abs_path);
+	free(_new_abs_path);
 	_file = file_resolve(_ctx->root, _payload->old_path);
 	_new_parent_dir = get_parent_directory(_ctx->root, _payload->new_path);
 	TEST_NULL(_file, ERR_DIR_NOT_FOUND);
 	TEST_NULL(_new_parent_dir, ERR_DIR_NOT_FOUND);
-	_slash = strrchr(_payload->new_path, '/');
+	_slash = strrchr(_payload->new_path, '/'); 
 	if (NULL == _slash)
-	{
-		if (false == directory_file_rename(_file, _payload->new_path))
-			return (free(_old_abs_path), free(_new_abs_path), ERR_INTERNAL_MEMORY);
-	}
+		TEST_ERROR_FN(directory_file_rename(_file, _payload->new_path), ERR_INTERNAL_MEMORY);
 	else
-	{
-		if (false == directory_file_rename(_file, _slash + 1))
-			return (free(_old_abs_path), free(_new_abs_path), ERR_INTERNAL_MEMORY);
-	}
+		TEST_ERROR_FN(directory_file_rename(_file, _slash + 1), ERR_INTERNAL_MEMORY);
+
 	TEST_ERROR_FN(
 		directory_file_move(_new_parent_dir, _file->parent, _file),
 		ERR_OPERATION_FAILED
 	);
-	free(_old_abs_path);
-	free(_new_abs_path);
 	return (ERR_SUCCESS);
 }
 

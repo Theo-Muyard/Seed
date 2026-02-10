@@ -68,7 +68,7 @@ static int test_directory_and_file_lifecycle(t_Manager *manager)
     print_section("DIRECTORY & FILE LIFECYCLE");
 
     // reopen root
-    t_CmdOpenRoot open_root = { .path = "/home/theo/Documents/Development/Seed/src/backend/tmp" };
+    t_CmdOpenRoot open_root = { .path = "" };
     cmd.id = CMD_FS_OPEN_ROOT;
     cmd.payload = &open_root;
     if (manager_exec(manager, &cmd))

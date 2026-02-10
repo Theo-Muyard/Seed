@@ -25,7 +25,7 @@ const t_CommandEntry	fs_commands[] = {
 	{ CMD_FS_EDIT_FILE,		sizeof(t_CmdEditDataFile),	cmd_file_edit_data }
 };
 
-bool	fs_init(t_Manager	*manager)
+bool	fs_init(t_Manager *manager)
 {
 	t_FileSystemCtx		*_ctx;
 

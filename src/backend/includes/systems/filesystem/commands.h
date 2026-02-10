@@ -3,24 +3,6 @@
 
 # include "core/manager.h"
 
-// +===----- Macros -----===+ //
-
-/**
- * @brief Test if the os dir function return an error and catch it
- * @param fn The os function
-*/
-# define TEST_OS_DIR_ERR(fn)	\
-	if (false == fn)	\
-		return (get_dir_error());
-
-/**
- * @brief Test if the os file function return an error and catch it
- * @param fn The os function
-*/
-# define TEST_OS_FILE_ERR(fn)	\
-	if (false == fn)	\
-		return (get_file_error());
-
 // +===----- OS Errors -----===+ //
 
 /**

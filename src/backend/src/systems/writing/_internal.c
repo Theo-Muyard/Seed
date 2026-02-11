@@ -43,7 +43,7 @@ t_Line		*line_create(void)
 	if (NULL == line)
 		return (NULL);
 	line->data = NULL;
-	line->len = 0;
+	line->size = 0;
 	line->capacity = 0;
 	line->prev = NULL;
 	line->next = NULL;
@@ -121,13 +121,13 @@ t_Line		*buffer_line_split(t_Buffer *buffer, t_Line *line, size_t index)
 
 	if (NULL == buffer || NULL == line)
 		return (NULL);
-	if (index > line->len)
+	if (index > line->size)
 		return (NULL);
 
 	_new_line = line_create();
 	if (NULL == _new_line)
 		return (NULL);
-	_size = line->len - index;
+	_size = line->size - index;
 	if (false == line_insert_data(_new_line, 0, _size, line->data + index))
 		return (buffer_line_destroy(buffer, _new_line), NULL);
 	if (false == line_delete_data(line, index, _size))
@@ -146,7 +146,7 @@ t_Line		*buffer_line_join(t_Buffer *buffer, t_Line *dst, t_Line *src)
 {
 	if (NULL == dst || NULL == src)
 		return (NULL);
-	if (false == line_insert_data(dst, dst->len, src->len, src->data))
+	if (false == line_insert_data(dst, dst->size, src->size, src->data))
 		return (NULL);
 	buffer_line_destroy(buffer, src);
 	return (dst);
@@ -177,7 +177,7 @@ t_Line		*buffer_get_line(t_Buffer *buffer, ssize_t index)
 
 // +===----- DATA -----===+ //
 
-bool		line_insert_data(t_Line *line, ssize_t column, size_t size, const char *data)
+bool		line_insert_data(t_Line *line, ssize_t index, size_t size, const char *data)
 {
 	char	*_new_data;
 	size_t	_needed_capacity;
@@ -185,12 +185,12 @@ bool		line_insert_data(t_Line *line, ssize_t column, size_t size, const char *da
 
 	if (NULL == line || NULL == data)
 		return (false);
-	if (column < 0)
-		column = line->len;
-	if ((size_t)column > line->len)
+	if (index < 0)
+		index = line->size;
+	if ((size_t)index > line->size)
 		return (false);
 
-	_needed_capacity = line->len + size + 1;
+	_needed_capacity = line->size + size + 1;
 	if (_needed_capacity > line->capacity)
 	{
 		_new_capacity = line->capacity ? line->capacity : DATA_ALLOC;
@@ -203,33 +203,33 @@ bool		line_insert_data(t_Line *line, ssize_t column, size_t size, const char *da
 		line->capacity = _new_capacity;
 	}
 	memmove(
-		line->data + column + size,
-		line->data + column,
-		line->len - column
+		line->data + index + size,
+		line->data + index,
+		line->size - index
 	);
-	memcpy(line->data + column, data, size);
-	line->len += size;
-	line->data[line->len] = '\0';
+	memcpy(line->data + index, data, size);
+	line->size += size;
+	line->data[line->size] = '\0';
 	return (true);
 }
 
-bool		line_delete_data(t_Line *line, size_t column, size_t size)
+bool		line_delete_data(t_Line *line, size_t index, size_t size)
 {
 	if (NULL == line)
 		return (false);
-	if (column > line->len)
+	if (index > line->size)
 		return (false);
-	if (column + size > line->len)
-    	size = line->len - column;
-	if (NULL == line->data || line->len == 0)
+	if (index + size > line->size)
+    	size = line->size - index;
+	if (NULL == line->data || line->size == 0)
 		return (false);
 
 	memmove(
-			line->data + column,
-			line->data + column + size,
-			line->len - (column + size)
+			line->data + index,
+			line->data + index + size,
+			line->size - (index + size)
 	);
-	line->len = line->len - size;
-	line->data[line->len] = '\0';
+	line->size = line->size - size;
+	line->data[line->size] = '\0';
 	return (true);
 }

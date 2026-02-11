@@ -16,8 +16,7 @@ static size_t	utf_char_to_byte(const char *str, size_t index)
 	size_t	_i;
 	size_t	_count;
 
-	if (NULL == str)
-		return (0);
+	TEST_NULL(str, 0);
 	_i = 0;
 	_count = 0;
 	while (str[_i])

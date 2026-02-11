@@ -36,14 +36,103 @@ static void print_error(const char *msg)
 
 // +===----- Test Cases -----===+ //
 
-static int test_root_open_close(t_Manager *manager)
+// static int	get_tree(t_Directory *root)
+// {
+// 	typedef struct s_Frame
+// 	{
+// 		t_Directory	*dir;
+// 		size_t		next_dir;
+// 		size_t		next_file;
+// 	}	t_Frame;
+
+// 	t_Frame	*stack;
+// 	bool	*is_last_depth;
+// 	size_t	capacity;
+// 	size_t	depth;
+// 	size_t	i;
+// 	size_t	pos;
+// 	size_t	total;
+// 	bool	is_last;
+
+// 	if (NULL == root)
+// 		return (1);
+// 	printf("%s\n", root->dirname ? root->dirname : "/");
+// 	capacity = 32;
+// 	stack = malloc(capacity * sizeof(t_Frame));
+// 	is_last_depth = malloc(capacity * sizeof(bool));
+// 	if (NULL == stack || NULL == is_last_depth)
+// 		return (free(stack), free(is_last_depth), 1);
+// 	depth = 0;
+// 	stack[0].dir = root;
+// 	stack[0].next_dir = 0;
+// 	stack[0].next_file = 0;
+// 	is_last_depth[0] = true;
+// 	while (true)
+// 	{
+// 		total = stack[depth].dir->subdir_count + stack[depth].dir->files_count;
+// 		if (stack[depth].next_dir < stack[depth].dir->subdir_count)
+// 		{
+// 			pos = stack[depth].next_dir++;
+// 			is_last = (pos + 1 == total);
+// 			i = 1;
+// 			while (i <= depth)
+// 			{
+// 				printf("%s", is_last_depth[i] ? "    " : "|   ");
+// 				i++;
+// 			}
+// 			printf("%s%s/\n", is_last ? "`-- " : "|-- ",
+// 				stack[depth].dir->subdir[pos]->dirname);
+// 			if (depth + 1 >= capacity)
+// 			{
+// 				t_Frame	*new_stack;
+// 				bool	*new_is_last;
+
+// 				capacity *= 2;
+// 				new_stack = realloc(stack, capacity * sizeof(t_Frame));
+// 				new_is_last = realloc(is_last_depth, capacity * sizeof(bool));
+// 				if (NULL == new_stack || NULL == new_is_last)
+// 					return (free(new_stack), free(new_is_last), 1);
+// 				stack = new_stack;
+// 				is_last_depth = new_is_last;
+// 			}
+// 			depth++;
+// 			stack[depth].dir = stack[depth - 1].dir->subdir[pos];
+// 			stack[depth].next_dir = 0;
+// 			stack[depth].next_file = 0;
+// 			is_last_depth[depth] = is_last;
+// 			continue ;
+// 		}
+// 		if (stack[depth].next_file < stack[depth].dir->files_count)
+// 		{
+// 			pos = stack[depth].next_file++;
+// 			is_last = (stack[depth].dir->subdir_count + pos + 1 == total);
+// 			i = 1;
+// 			while (i <= depth)
+// 			{
+// 				printf("%s", is_last_depth[i] ? "    " : "|   ");
+// 				i++;
+// 			}
+// 			printf("%s%s\n", is_last ? "`-- " : "|-- ",
+// 				stack[depth].dir->files[pos]->filename);
+// 			continue ;
+// 		}
+// 		if (0 == depth)
+// 			break ;
+// 		depth--;
+// 	}
+// 	free(stack);
+// 	free(is_last_depth);
+// 	return (0);
+// }
+
+static int	test_root_open_close(t_Manager *manager)
 {
     t_Command       cmd;
     t_CmdOpenRoot   payload;
 
     print_section("ROOT OPEN / CLOSE");
 
-    payload.path = "/home/theo/Documents/Development/Seed/src/backend/tmp";
+    payload.path = "/home/tmuyard/Seed/src/backend/tmp";
     cmd.id = CMD_FS_OPEN_ROOT;
     cmd.payload = &payload;
 

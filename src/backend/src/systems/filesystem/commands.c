@@ -51,31 +51,38 @@ static t_ErrorCode	get_dir_error(void)
 // +===----- Path -----===+ //
 
 /**
- * 
+ * @brief Join two paths.
+ * @param base The base path.
+ * @param path The path that will be added to the end of the base.
+ * @return The joined allocated path.
 */
-static char	*get_absolute_path(t_FileSystemCtx *ctx, const char *path)
+static char	*join_path(const char *base, const char *path)
 {
-	char	*abs_path;
-	size_t	_size;
+	char	*joined_path;
+	size_t	_base_len;
+	size_t	_path_len;
 	size_t	_len;
+	int		_need_slash;
 
-	TEST_NULL(ctx, NULL);
+	TEST_NULL(base, NULL);
 	TEST_NULL(path, NULL);
-	TEST_NULL(ctx->root_path, NULL);
 
-	_len = strlen(path);
-	_size = ctx->path_len + 1 + _len + 1;
-	abs_path = malloc(_size * sizeof(char));
-	TEST_NULL(abs_path, NULL);
-	memcpy(abs_path, ctx->root_path, ctx->path_len);
-	abs_path[ctx->path_len] = '/';
+	_base_len = strlen(base);
+	_path_len = strlen(path);
+	_len = _base_len + _path_len;
+	_need_slash = (_base_len > 0 && base[_base_len - 1] != '/');
+	joined_path = malloc((_len + _need_slash + 1) * sizeof(char));
+	TEST_NULL(joined_path, NULL);
+	memcpy(joined_path, base, _base_len);
+	if (_need_slash)
+		joined_path[_base_len++] = '/';
 	memcpy(
-		abs_path + ctx->path_len + 1,
+		joined_path + _base_len,
 		path,
-		_len
+		_path_len
 	);
-	abs_path[_size - 1] = '\0';
-	return (abs_path);
+	joined_path[_len + _need_slash] = '\0';
+	return (joined_path);
 }
 
 /**
@@ -98,6 +105,48 @@ static t_Directory	*get_parent_directory(t_Directory *root, const char *path)
 	return (_dir);
 }
 
+static t_ErrorCode	get_VFS_root(t_Directory *root, const char *abs_path)
+{
+	DIR				*_dir;
+	struct dirent	*_entry;
+	struct stat		_st;
+	char			*_entry_path;
+	t_Directory		*_subdir;
+	t_ErrorCode		_err;
+
+	_dir = opendir(abs_path);
+	if (NULL == _dir)
+		return (get_dir_error());
+	while ((_entry = readdir(_dir)) != NULL)
+	{
+		if (strcmp(_entry->d_name, ".") == 0
+			|| strcmp(_entry->d_name, "..") == 0)
+			continue ;
+		_entry_path = join_path(abs_path, _entry->d_name);
+		if (NULL == _entry_path)
+			return (closedir(_dir), ERR_INTERNAL_MEMORY);
+		if (stat(_entry_path, &_st) == -1)
+			return (free(_entry_path), closedir(_dir), get_dir_error());
+		if (S_ISDIR(_st.st_mode))
+		{
+			_subdir = directory_create(root, _entry->d_name);
+			if (NULL == _subdir)
+				return (free(_entry_path), closedir(_dir), ERR_INTERNAL_MEMORY);
+			_err = get_VFS_root(_subdir, _entry_path);
+			if (_err)
+				return (free(_entry_path), closedir(_dir), _err);
+		}
+		else if (S_ISREG(_st.st_mode))
+		{
+			if (NULL == file_create(root, _entry->d_name))
+				return (free(_entry_path), closedir(_dir), ERR_INTERNAL_MEMORY);
+		}
+		free(_entry_path);
+	}
+	closedir(_dir);
+	return (ERR_SUCCESS);
+}
+
 // +===----- Root -----===+ //
 
 t_ErrorCode	cmd_root_open(t_Manager *manager, const t_Command *cmd)
@@ -106,10 +155,28 @@ t_ErrorCode	cmd_root_open(t_Manager *manager, const t_Command *cmd)
 	t_CmdOpenRoot	*_payload;
 	t_Directory		*_root;
 	char			*_dirname;
+	char			*_normalized;
+	struct stat		_st;
+	t_ErrorCode		_err;
 
 	_ctx = manager->fs_ctx;
 	_payload = cmd->payload;
 	TEST_NULL(_payload->path, ERR_INVALID_PAYLOAD);
+	_normalized = ft_strdup(_payload->path);
+	TEST_NULL(_normalized, ERR_INTERNAL_MEMORY);
+	if (stat(_normalized, &_st) == -1)
+		return (free(_normalized), ERR_OPERATION_FAILED);
+	if (!S_ISDIR(_st.st_mode))
+		return (free(_normalized), ERR_DIR_NOT_FOUND);
+	_dirname = strrchr(_normalized, '/');
+	if (NULL == _dirname)
+		return (free(_normalized), ERR_INVALID_PAYLOAD);
+	_root = directory_create(NULL, _dirname + 1);
+	if (NULL == _root)
+		return (free(_normalized), ERR_INTERNAL_MEMORY);
+	_err = get_VFS_root(_root, _normalized);
+	if (_err)
+		return (free(_normalized), directory_destroy(_root), _err);
 	if (_ctx->root)
 	{
 		directory_destroy(_ctx->root);
@@ -118,14 +185,8 @@ t_ErrorCode	cmd_root_open(t_Manager *manager, const t_Command *cmd)
 		_ctx->root_path = NULL;
 		_ctx->path_len = 0;
 	}
-	_dirname = strrchr(_payload->path, '/');
-	TEST_NULL(_dirname, ERR_INVALID_PAYLOAD);
-	_root = directory_create(NULL, _dirname + 1);
-	TEST_NULL(_root, ERR_INTERNAL_MEMORY);
 	_ctx->root = _root;
-	_ctx->root_path = ft_strdup(_payload->path);
-	if (NULL == _ctx->root_path)
-		return (directory_destroy(_ctx->root), ERR_INTERNAL_MEMORY);
+	_ctx->root_path = _normalized;
 	_ctx->path_len = strlen(_ctx->root_path);
 	return (ERR_SUCCESS);
 }
@@ -159,7 +220,7 @@ t_ErrorCode	cmd_directory_create(t_Manager *manager, const t_Command *cmd)
 	_payload = cmd->payload;
 	TEST_NULL(_ctx->root, ERR_FS_CONTEXT_NOT_INITIALIZED);
 	TEST_NULL(_payload->path, ERR_INVALID_PAYLOAD);
-	_abs_path = get_absolute_path(_ctx, _payload->path);
+	_abs_path = join_path(_ctx->root_path, _payload->path);
 	TEST_NULL(_abs_path, ERR_INTERNAL_MEMORY);
 	if (false == os_dir_create(_abs_path, 0755))
 		return (free(_abs_path), get_dir_error());
@@ -187,7 +248,7 @@ t_ErrorCode	cmd_directory_delete(t_Manager *manager, const t_Command *cmd)
 	_payload = cmd->payload;
 	TEST_NULL(_ctx->root, ERR_FS_CONTEXT_NOT_INITIALIZED);
 	TEST_NULL(_payload->path, ERR_INVALID_PAYLOAD);
-	_abs_path = get_absolute_path(_ctx, _payload->path);
+	_abs_path = join_path(_ctx->root_path, _payload->path);
 	TEST_NULL(_abs_path, ERR_INTERNAL_MEMORY);
 	if (false == os_dir_delete(_abs_path))
 		return (free(_abs_path), get_dir_error());
@@ -217,8 +278,8 @@ t_ErrorCode	cmd_directory_move(t_Manager *manager, const t_Command *cmd)
 	TEST_NULL(_ctx->root, ERR_FS_CONTEXT_NOT_INITIALIZED);
 	TEST_NULL(_payload->old_path, ERR_INVALID_PAYLOAD);
 	TEST_NULL(_payload->new_path, ERR_INVALID_PAYLOAD);
-	_old_abs_path = get_absolute_path(_ctx, _payload->old_path);
-	_new_abs_path = get_absolute_path(_ctx, _payload->new_path);
+	_old_abs_path = join_path(_ctx->root_path, _payload->old_path);
+	_new_abs_path = join_path(_ctx->root_path, _payload->new_path);
 	TEST_NULL(_old_abs_path, ERR_OPERATION_FAILED);
 	TEST_NULL(_new_abs_path, ERR_OPERATION_FAILED);
 	if (false == os_dir_move(_old_abs_path, _new_abs_path))
@@ -260,7 +321,7 @@ t_ErrorCode	cmd_file_create(t_Manager *manager, const t_Command *cmd)
 	_payload = cmd->payload;
 	TEST_NULL(_ctx->root, ERR_FS_CONTEXT_NOT_INITIALIZED);
 	TEST_NULL(_payload->path, ERR_INVALID_PAYLOAD);
-	_abs_path = get_absolute_path(_ctx, _payload->path);
+	_abs_path = join_path(_ctx->root_path, _payload->path);
 	TEST_NULL(_abs_path, ERR_INTERNAL_MEMORY);
 	_file = os_file_create(_abs_path, "w");
 	if (NULL == _file)
@@ -290,7 +351,7 @@ t_ErrorCode	cmd_file_delete(t_Manager *manager, const t_Command *cmd)
 	_payload = cmd->payload;
 	TEST_NULL(_ctx->root, ERR_FS_CONTEXT_NOT_INITIALIZED);
 	TEST_NULL(_payload->path, ERR_INVALID_PAYLOAD);
-	_abs_path = get_absolute_path(_ctx, _payload->path);
+	_abs_path = join_path(_ctx->root_path, _payload->path);
 	TEST_NULL(_abs_path, ERR_INTERNAL_MEMORY);
 	if (false == os_file_delete(_abs_path))
 		return (free(_abs_path), get_file_error());
@@ -320,8 +381,8 @@ t_ErrorCode	cmd_file_move(t_Manager *manager, const t_Command *cmd)
 	TEST_NULL(_ctx->root, ERR_FS_CONTEXT_NOT_INITIALIZED);
 	TEST_NULL(_payload->old_path, ERR_INVALID_PAYLOAD);
 	TEST_NULL(_payload->new_path, ERR_INVALID_PAYLOAD);
-	_old_abs_path = get_absolute_path(_ctx, _payload->old_path);
-	_new_abs_path = get_absolute_path(_ctx, _payload->new_path);
+	_old_abs_path = join_path(_ctx->root_path, _payload->old_path);
+	_new_abs_path = join_path(_ctx->root_path, _payload->new_path);
 	TEST_NULL(_old_abs_path, ERR_OPERATION_FAILED);
 	TEST_NULL(_new_abs_path, ERR_OPERATION_FAILED);
 	if (false == os_file_move(_old_abs_path, _new_abs_path))
@@ -361,7 +422,7 @@ t_ErrorCode	cmd_file_read(t_Manager *manager, const t_Command *cmd)
 	_payload = cmd->payload;
 	TEST_NULL(_ctx->root, ERR_FS_CONTEXT_NOT_INITIALIZED);
 	TEST_NULL(_payload->path, ERR_INVALID_PAYLOAD);
-	_abs_path = get_absolute_path(_ctx, _payload->path);
+	_abs_path = join_path(_ctx->root_path, _payload->path);
 	TEST_NULL(_abs_path, ERR_OPERATION_FAILED);
 	_file = os_file_open(_abs_path, "r");
 	free(_abs_path);
@@ -388,7 +449,7 @@ t_ErrorCode	cmd_file_write(t_Manager *manager, const t_Command *cmd)
 	TEST_NULL(_ctx->root, ERR_FS_CONTEXT_NOT_INITIALIZED);
 	TEST_NULL(_payload->path, ERR_INVALID_PAYLOAD);
 	TEST_NULL(_payload->data, ERR_INVALID_PAYLOAD);
-	_abs_path = get_absolute_path(_ctx, _payload->path);
+	_abs_path = join_path(_ctx->root_path, _payload->path);
 	TEST_NULL(_abs_path, ERR_OPERATION_FAILED);
 	_file = os_file_open(_abs_path, "w");
 	free(_abs_path);

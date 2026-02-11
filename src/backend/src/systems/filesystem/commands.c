@@ -86,7 +86,10 @@ static char	*join_path(const char *base, const char *path)
 }
 
 /**
- * 
+ * @brief Get the parent directory of the given path.
+ * @param root The root of the VFS.
+ * @param path The path of file / directory.
+ * @return The parent directory.
 */
 static t_Directory	*get_parent_directory(t_Directory *root, const char *path)
 {
@@ -105,6 +108,12 @@ static t_Directory	*get_parent_directory(t_Directory *root, const char *path)
 	return (_dir);
 }
 
+/**
+ * @brief Initialize the VFS root. Retrive all subdirs and files.
+ * @param root The root directory of the VFS.
+ * @param abs_path The absolute path of the root directory.
+ * @return A Seed ErrorCode.
+*/
 static t_ErrorCode	get_VFS_root(t_Directory *root, const char *abs_path)
 {
 	DIR				*_dir;

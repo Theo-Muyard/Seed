@@ -2,6 +2,7 @@
 # define SEED_TESTS_TOOLS_H
 
 # include "dependency.h"
+# include "seed.h"
 
 // +===----- Colors -----===+ //
 
@@ -36,5 +37,28 @@ void	print_error(const char *message);
  * @param status The status of the test (0 or 1).
 */
 void	print_status(int status);
+
+/**
+ * @brief Assert equality for error codes and print result.
+ * @param got The returned code.
+ * @param expected The expected code.
+ * @param message The assertion message.
+ * @return 0 on success, 1 on failure.
+*/
+int		assert_error_code(t_ErrorCode got, t_ErrorCode expected, const char *message);
+
+/**
+ * @brief Create a unique temporary directory under /tmp.
+ * @param prefix The directory prefix.
+ * @return Allocated absolute path, or NULL on error.
+*/
+char	*test_tmpdir_create(const char *prefix);
+
+/**
+ * @brief Recursively delete a directory tree.
+ * @param path The root path to delete.
+ * @return true on success, false otherwise.
+*/
+bool	test_tmpdir_remove(const char *path);
 
 #endif

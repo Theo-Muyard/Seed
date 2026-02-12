@@ -4,7 +4,17 @@
 # include "dependency.h"
 # include "systems/filesystem/system.h"
 
-// +===-----  -----===+ //
+// +===----- Types -----===+ //
+
+/* A pending move */
+typedef struct	s_MovePending
+{
+	uint32_t	cookie;	/* The OS cookie */
+	bool		is_dir;	/* Directory or file */
+	char		*from_path;	/* The old path */
+}	t_MovePending;
+
+// +===----- Functions -----===+ //
 
 /**
  * @brief Initialize the VFS root. Retrive all subdirs and files.

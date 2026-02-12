@@ -2,6 +2,57 @@
 #include "systems/filesystem/commands.h"
 #include "systems/filesystem/_watcher.h"
 
+// TODO: delete
+static void	print_vfs_tree_node(const t_Directory *dir, const char *prefix, bool is_last)
+{
+	size_t			i;
+	size_t			total;
+	char			next_prefix[1024];
+	const char		*name;
+
+	if (NULL == dir)
+		return ;
+	name = dir->dirname;
+	if (NULL == name || '\0' == name[0])
+		name = ".";
+	if (NULL == prefix)
+		printf("%s\n", name);
+	else
+		printf("%s%s%s\n", prefix, is_last ? "`-- " : "|-- ", name);
+	if (NULL == prefix)
+		snprintf(next_prefix, sizeof(next_prefix), "");
+	else
+		snprintf(next_prefix, sizeof(next_prefix), "%s%s", prefix, is_last ? "    " : "|   ");
+	total = dir->subdir_count + dir->files_count;
+	i = 0;
+	while (i < dir->subdir_count)
+	{
+		print_vfs_tree_node(dir->subdir[i], next_prefix, (i + 1 == total));
+		i++;
+	}
+	i = 0;
+	while (i < dir->files_count)
+	{
+		printf("%s%s%s\n", next_prefix, (dir->subdir_count + i + 1 == total)
+			? "`-- " : "|-- ", dir->files[i]->filename);
+		i++;
+	}
+}
+
+// TODO: Delete
+static void dbg_mask(uint32_t m) {
+	if (m & IN_CREATE) printf("IN_CREATE ");
+	if (m & IN_DELETE) printf("IN_DELETE ");
+	if (m & IN_DELETE_SELF) printf("IN_DELETE_SELF ");
+	if (m & IN_MOVE_SELF) printf("IN_MOVE_SELF ");
+	if (m & IN_MOVED_FROM) printf("IN_MOVED_FROM ");
+	if (m & IN_MOVED_TO) printf("IN_MOVED_TO ");
+	if (m & IN_IGNORED) printf("IN_IGNORED ");
+	if (m & IN_ISDIR) printf("IN_ISDIR ");
+	if (m & IN_UNMOUNT) printf("IN_UNMOUNT ");
+	printf("\n");
+}
+
 t_ErrorCode	get_VFS_root(t_Directory *root, const char *abs_path)
 {
 	DIR				*_dir;
@@ -112,18 +163,34 @@ static bool	watch_delete_file(t_Directory *parent, char *filename)
 	return (true);
 }
 
-// TODO: Delete
-static void dbg_mask(uint32_t m) {
-	if (m & IN_CREATE) printf("IN_CREATE ");
-	if (m & IN_DELETE) printf("IN_DELETE ");
-	if (m & IN_DELETE_SELF) printf("IN_DELETE_SELF ");
-	if (m & IN_MOVE_SELF) printf("IN_MOVE_SELF ");
-	if (m & IN_MOVED_FROM) printf("IN_MOVED_FROM ");
-	if (m & IN_MOVED_TO) printf("IN_MOVED_TO ");
-	if (m & IN_IGNORED) printf("IN_IGNORED ");
-	if (m & IN_ISDIR) printf("IN_ISDIR ");
-	if (m & IN_UNMOUNT) printf("IN_UNMOUNT ");
-	printf("\n");
+static bool	handle_events(t_Directory *root, struct inotify_event *event)
+{
+	if (event->mask & IN_CREATE)
+	{
+		if (event->mask & IN_ISDIR)
+		{
+			TEST_ERROR_FN(watch_add_directory(root, event->name), false);
+		}
+		else
+		{
+			TEST_ERROR_FN(watch_add_file(root, event->name), false);
+		}
+	}
+	else if (event->mask & IN_DELETE || event->mask & IN_MOVE)
+	{
+		if (event->mask & IN_ISDIR)
+		{
+			if (event->mask & IN_MOVE)
+			{
+			}
+			TEST_ERROR_FN(watch_delete_directory(root, event->name), false);
+		}
+		else
+		{
+			TEST_ERROR_FN(watch_delete_file(root, event->name), false);
+		}
+	}
+	return (true);
 }
 
 bool	apply_events(t_Directory *root, int inotify_fd)
@@ -132,7 +199,6 @@ bool	apply_events(t_Directory *root, int inotify_fd)
 	char					_buffer[4096];
 	ssize_t					_len;
 	char					*_ptr;
-
 
 	_len = read(inotify_fd, _buffer, sizeof(_buffer));
 	if (_len < 0)
@@ -143,73 +209,14 @@ bool	apply_events(t_Directory *root, int inotify_fd)
 		_event = (struct inotify_event *)_ptr;
 		if (_event->mask & IN_Q_OVERFLOW)
 			return (false);
-		// TODO: Mapping events
 		dbg_mask(_event->mask);
 		if (_event->mask & IN_IGNORED || _event->mask & IN_MOVE_SELF
 			|| _event->mask & IN_DELETE_SELF)
 			return (false);
-		if (_event->mask & IN_CREATE)
-		{
-			if (_event->mask & IN_ISDIR)
-			{
-				TEST_ERROR_FN(watch_add_directory(root, _event->name), false);
-			}
-			else
-			{
-				TEST_ERROR_FN(watch_add_file(root, _event->name), false);
-			}
-		}
-		if (_event->mask & IN_DELETE || _event->mask & IN_MOVE)
-		{
-			if (_event->mask & IN_ISDIR)
-			{
-				TEST_ERROR_FN(watch_delete_directory(root, _event->name), false);
-			}
-			else
-			{
-				TEST_ERROR_FN(watch_delete_file(root, _event->name), false);
-			}
-		}
+		handle_events(root, _event);
 		_ptr += sizeof(struct inotify_event) + _event->len;
 	}
 	return (true);
-}
-
-// TODO: delete
-static void	print_vfs_tree_node(const t_Directory *dir, const char *prefix, bool is_last)
-{
-	size_t			i;
-	size_t			total;
-	char			next_prefix[1024];
-	const char		*name;
-
-	if (NULL == dir)
-		return ;
-	name = dir->dirname;
-	if (NULL == name || '\0' == name[0])
-		name = ".";
-	if (NULL == prefix)
-		printf("%s\n", name);
-	else
-		printf("%s%s%s\n", prefix, is_last ? "`-- " : "|-- ", name);
-	if (NULL == prefix)
-		snprintf(next_prefix, sizeof(next_prefix), "");
-	else
-		snprintf(next_prefix, sizeof(next_prefix), "%s%s", prefix, is_last ? "    " : "|   ");
-	total = dir->subdir_count + dir->files_count;
-	i = 0;
-	while (i < dir->subdir_count)
-	{
-		print_vfs_tree_node(dir->subdir[i], next_prefix, (i + 1 == total));
-		i++;
-	}
-	i = 0;
-	while (i < dir->files_count)
-	{
-		printf("%s%s%s\n", next_prefix, (dir->subdir_count + i + 1 == total)
-			? "`-- " : "|-- ", dir->files[i]->filename);
-		i++;
-	}
 }
 
 int	main(int ac, char **av)

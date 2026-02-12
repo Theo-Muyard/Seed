@@ -3,6 +3,35 @@
 
 // +===----- Path -----===+ //
 
+char	*join_path(const char *base, const char *path)
+{
+	char	*joined_path;
+	size_t	_base_len;
+	size_t	_path_len;
+	size_t	_len;
+	int		_need_slash;
+
+	TEST_NULL(base, NULL);
+	TEST_NULL(path, NULL);
+
+	_base_len = strlen(base);
+	_path_len = strlen(path);
+	_len = _base_len + _path_len;
+	_need_slash = (_base_len > 0 && base[_base_len - 1] != '/');
+	joined_path = malloc((_len + _need_slash + 1) * sizeof(char));
+	TEST_NULL(joined_path, NULL);
+	memcpy(joined_path, base, _base_len);
+	if (_need_slash)
+		joined_path[_base_len++] = '/';
+	memcpy(
+		joined_path + _base_len,
+		path,
+		_path_len
+	);
+	joined_path[_len + _need_slash] = '\0';
+	return (joined_path);
+}
+
 char		*directory_get_relative_path(const t_Directory *dir)
 {
 	t_Directory	*_tmp;
@@ -189,7 +218,7 @@ bool		directory_file_remove(t_Directory *dir, t_File *file)
 			memmove(
 				dir->files + _i,
 				dir->files + _i + 1,
-				dir->files_count - _i
+				(dir->files_count - _i - 1) * sizeof(t_File *)
 			);
 			dir->files_count--;
 			file->parent = NULL;
@@ -336,7 +365,7 @@ bool		directory_subdir_remove(t_Directory *dir, t_Directory *subdir)
 			memmove(
 				dir->subdir + _i,
 				dir->subdir + _i + 1,
-				dir->subdir_count - _i
+				(dir->subdir_count - _i - 1) * sizeof(t_Directory *)
 			);
 			dir->subdir_count--;
 			subdir->parent = NULL;

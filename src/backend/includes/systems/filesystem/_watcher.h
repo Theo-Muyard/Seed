@@ -6,13 +6,33 @@
 
 // +===----- Types -----===+ //
 
-/* A pending move */
-typedef struct	s_MovePending
+typedef struct s_WatchEntry
 {
-	uint32_t	cookie;	/* The OS cookie */
-	bool		is_dir;	/* Directory or file */
-	char		*from_path;	/* The old path */
+	int		wd;
+	char	*path;
+}	t_WatchEntry;
+
+typedef struct s_MovePending
+{
+	uint32_t	cookie;
+	bool		is_dir;
+	char		*from_path;
+	time_t		created_at;
 }	t_MovePending;
+
+typedef struct s_WatchCtx
+{
+	int				fd;
+	char			*root_path;
+
+	t_WatchEntry	*entries;
+	size_t			entry_count;
+	size_t			entry_capacity;
+
+	t_MovePending	*pending;
+	size_t			pending_count;
+	size_t			pending_capacity;
+}	t_WatchCtx;
 
 // +===----- Functions -----===+ //
 

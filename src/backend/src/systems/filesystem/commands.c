@@ -1,9 +1,9 @@
 #include "seed.h"
 #include "dependency.h"
 #include "tools/memory.h"
-#include "systems/filesystem/_internal.h"
+#include "systems/filesystem/vfs/_internal.h"
+#include "systems/filesystem/watcher/_internal.h"
 #include "systems/filesystem/_os.h"
-#include "systems/filesystem/_watcher.h"
 #include "systems/filesystem/commands.h"
 #include "systems/filesystem/system.h"
 
@@ -39,6 +39,54 @@ t_ErrorCode	get_dir_error(void)
 				return (ERR_OPERATION_FAILED);
 		}
 	return (ERR_OPERATION_FAILED);
+}
+
+/**
+ * @brief Initialize the VFS root. Retrive all subdirs and files.
+ * @param root The root directory of the VFS.
+ * @param abs_path The absolute path of the root directory.
+ * @return A Seed ErrorCode.
+*/
+t_ErrorCode	get_VFS_root(t_Directory *root, const char *abs_path)
+{
+	DIR				*_dir;
+	struct dirent	*_entry;
+	struct stat		_st;
+	char			*_entry_path;
+	t_Directory		*_subdir;
+	t_ErrorCode		_err;
+
+	_dir = opendir(abs_path);
+	if (NULL == _dir)
+		return (get_dir_error());
+	while ((_entry = readdir(_dir)) != NULL)
+	{
+		if (strcmp(_entry->d_name, ".") == 0
+			|| strcmp(_entry->d_name, "..") == 0)
+			continue ;
+		_entry_path = join_path(abs_path, _entry->d_name);
+		if (NULL == _entry_path)
+			return (closedir(_dir), ERR_INTERNAL_MEMORY);
+		if (stat(_entry_path, &_st) == -1)
+			return (free(_entry_path), closedir(_dir), get_dir_error());
+		if (S_ISDIR(_st.st_mode))
+		{
+			_subdir = directory_create(root, _entry->d_name);
+			if (NULL == _subdir)
+				return (free(_entry_path), closedir(_dir), ERR_INTERNAL_MEMORY);
+			_err = get_VFS_root(_subdir, _entry_path);
+			if (_err)
+				return (free(_entry_path), closedir(_dir), _err);
+		}
+		else if (S_ISREG(_st.st_mode))
+		{
+			if (NULL == file_create(root, _entry->d_name))
+				return (free(_entry_path), closedir(_dir), ERR_INTERNAL_MEMORY);
+		}
+		free(_entry_path);
+	}
+	closedir(_dir);
+	return (ERR_SUCCESS);
 }
 
 // +===----- Path -----===+ //
